@@ -102,7 +102,7 @@ int main(int argc, char *argv[]){
     //print_inode(inodes);
     
     /* get the parent dir inode# */    
-    char buf[1024] = ""; // for concat the splited path for get parent inode#
+    char buf[1024] = ""; // for concat the splited path for get parent inode#. Assume a file/dir name < 1024bytes
     int parent_inode = 0; // get the parent inode offset
     int count_split = 0; // count how many part of the path being splited
     char *entry_name[MAX_NESTING_DIR]; // separate the path by "/" and save, most dir nest 10.
@@ -112,17 +112,27 @@ int main(int argc, char *argv[]){
     
     if(count_split==1){ // root dir, only 1 "/" detected
         parent_inode = INODE_OFFSET; // 1st inode offset is root dir
+        strncpy(buf,"/", sizeof(char)); // abs. path begin with "/"        
     } else { // trim out the last entry(new dir), concat the splited entries back to string 
-        //strncpy(buf,"/", sizeof(char)); // abs. path begin with "/"        
-        for(int i=0; i<MAX_NESTING_DIR; i++){            
+        strncpy(buf,"/", sizeof(char)); // abs. path begin with "/"        
+        for(int i=1; i<count_split; i++){            
             strncat(buf, entry_name[i], sizeof(entry_name[i])); // start concat the entry_name
-            if(!*entry_name[i+1]){ // if empty, break
+            if(i+1 == count_split){ // if empty, break
                 break;
             }
             strncat(buf,"/", sizeof(char)); 
         }
+	/* for testing, print all the entries */
+        //for(int i=0; i<MAX_NESTING_DIR; i++){            
+	//    printf("entry[%d]: %s\n",i,entry_name[i]);
+        //    if(!*entry_name[i+1]){ // if empty, break
+        //        break;
+        //    }
+        //}
     }
-    printf("buf: %s\n",buf);
+    printf("buf: %s\n",buf); // print out the concated parent path
+    
+    /* after got the parent path, now use open_t to get the inode# for ".." */
     
     //makedir(fd, &sb, &inodes, dir_name);
     
