@@ -4,6 +4,7 @@
 #include <sys/stat.h>  // for open/read/write
 #include <fcntl.h>     // for open/read/write
 #include <unistd.h>    // for lseek
+#include <string.h>    // for strlen
 
 #include "../sfs.h"
 #include "../sfs_functions/sys_call.h"
@@ -47,7 +48,7 @@ int main(int argc, char *argv[]){
     if(argc==1){ // user did not input any specific path/file
         path = "/."; // current dir
     } 
-    else if(strncmp(argv[1],"/",sizeof(argv[1])) == 0){
+    else if(strncmp(argv[1],"/",strlen(argv[1])) == 0){
         path = "/."; // root dir
     }
     else {
