@@ -66,7 +66,7 @@ static int create_inode_table(int fd){
 }
 
 /* create all the available 4K blocks */
-static int create_blocks(fd){
+static int create_blocks(int fd){
     ssize_t ret=0;
     char *block[MAX_DATA_BLK];
 
