@@ -143,7 +143,7 @@ int split_path(char *path, char **entry_name){
             i = i + 1; // path + 1 for passthrough the "/"
             
             if(path[i+1]=='\0'){ // if the next char of path is '\0', finish
-                printf("path[%d] is \\0\n",i+1);
+                //printf("path[%d] is \\0\n",i+1);
                 break;
             }
         }

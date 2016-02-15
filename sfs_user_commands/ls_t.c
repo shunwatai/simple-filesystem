@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
     if(argc==1){ // user did not input any specific path/file
         path = "/."; // current dir
     } 
-    else if(strncmp(argv[1],"/",strlen(argv[1])) == 0){
+    else if(strncmp(argv[1],"/",sizeof(int)) == 0){
         path = "/."; // root dir
     }
     else {
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]){
         return -1;
     }
     
-    int offset = INODE_OFFSET * inum;
+    int offset = INODE_OFFSET * inum; // 4096 * inode_number = offset 
     
     //printf("inum: %d\n",inum);
     
@@ -83,6 +83,6 @@ int main(int argc, char *argv[]){
         return -1;
     }
     //print_inode(inodes);
-    
+    printf("i_size: %d\n",inodes.i_size);
     ls(fd,inodes);    
 }

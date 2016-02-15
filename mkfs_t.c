@@ -106,7 +106,7 @@ static int createrootdir(int fd){
     time_t now = time(0); // get time
     inodes.i_mtime = now; // create time
     inodes.i_type = 0; // 0 for dir
-    inodes.i_size = sizeof(DIR_NODE); // size of dir/file    
+    inodes.i_size = sizeof(DIR_NODE)*2; // initially, an empty dir has 2 entries . ..
     inodes.i_blocks = 1; // use 1 blk sin
     inodes.direct_blk[0] = sb.next_available_blk; // available blk offset    
     inodes.file_num = 2; // "." & ".."
