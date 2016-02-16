@@ -22,8 +22,9 @@
 
 static int makedir(int fd, struct superblock *sb, struct inode *inodes, char *dir_name, int parent_inode){
     ssize_t ret = 0;
-    printf("!!!!!!!!!!!!!!!!!!!\n");
+    
     /* inode editing */    
+    printf("check point 1: new inode initialise\n================\n");
     time_t now = time(0); // get time
     inodes->i_mtime = now; // set create time      
     inodes->i_type = 0;    // 0 mean dir, 1 mean file
@@ -32,8 +33,10 @@ static int makedir(int fd, struct superblock *sb, struct inode *inodes, char *di
     inodes->direct_blk[0] = sb->next_available_blk; // the offset of data blk
     inodes->indirect_blk = -1;  // no indirect blk
     inodes->file_num = 2;  // num of files, initial with "." ".."
+    print_inode(*inodes);
     
     /* data blk editing */   
+    printf("check point 2: write .->%d ..->%d to data blk\n================\n", inodes->i_number,parent_inode);
     DIR_NODE curdir = {".", inodes->i_number}; //name + inode#
     DIR_NODE parentdir = {"..", parent_inode}; //name + parent inode#
     lseek(fd, inodes->direct_blk[0], SEEK_SET); // goto the offset of that data blk
@@ -45,6 +48,7 @@ static int makedir(int fd, struct superblock *sb, struct inode *inodes, char *di
     }
     
     /* update the info. of inode */
+    printf("check point 3: write back new inode\n================\n");
     lseek(fd, sb->next_available_inode, SEEK_SET); // goto offset of inode that will be updated
     ret = write(fd, inodes, BLOCK_SIZE); // write new dir info into new inode
     if(ret!=BLOCK_SIZE){ // if not written 4096 bytes, error
@@ -52,6 +56,7 @@ static int makedir(int fd, struct superblock *sb, struct inode *inodes, char *di
         return -1;
     }
     /* update the info. of superblk */
+    printf("check point 4: update superblk\n================\n");
     sb->next_available_inode = sb->next_available_inode+BLOCK_SIZE; // nx available inode offset increased 4096
     sb->next_available_blk = sb->next_available_blk+BLOCK_SIZE; // nx available datablk offset increased 4096
     lseek(fd, SB_OFFSET, SEEK_SET); // goto offset of superblk
@@ -63,8 +68,13 @@ static int makedir(int fd, struct superblock *sb, struct inode *inodes, char *di
     printf("new dir wrote on inode#%d\n-----\n", inodes->i_number);
     
     /* update inode of parent dir(add the dir name) */    
-    printf("new dir: %s will be written on blk of parent dir\n",(char*)dir_name);
-    DIR_NODE newdir = {*dir_name, inodes->i_number}; // new dir name + its inode number
+    printf("check point 5: add new entry to parent dir\n================\n");
+    printf("new dir: %s will be written on blk of parent dir\n",dir_name); 
+     
+    DIR_NODE newdir; // entry for new dir
+    strncpy(newdir.dir, dir_name, sizeof(newdir.dir)); // new dir name
+    newdir.inode_number=inodes->i_number; // new dir inode number
+    
     struct inode pinode; // for read the parent inode. 
     lseek(fd, INODE_OFFSET+(parent_inode*INODE_OFFSET), SEEK_SET); // goto offset of parent inode
     ret = read(fd, &pinode, sizeof(struct inode));
@@ -82,13 +92,13 @@ static int makedir(int fd, struct superblock *sb, struct inode *inodes, char *di
         return -1;
     }
     pinode.i_size = pinode.i_size + sizeof(DIR_NODE); // after write success, increase size
+    print_inode(pinode);
     lseek(fd, INODE_OFFSET+(parent_inode*INODE_OFFSET), SEEK_SET); // go to parent inode again for update
     ret = write(fd, &pinode, BLOCK_SIZE);
     if(ret!=BLOCK_SIZE){
         perror("failed to update parent inode");
     }   
     
-
     return 0;
 }
 
@@ -151,7 +161,8 @@ int main(int argc, char *argv[]){
     /* the else part for get the path of parent dir */
     if(count_split==1){ // root dir, only 1 "/" detected
         parent_inode = 0; // 1st inode offset is root dir
-        strncpy(buf,"/", sizeof(char)); // abs. path begin with "/"        
+        strncpy(dir_name, entry_name[count_split-1], strlen(dir_name));
+        //strncpy(buf,"/", sizeof(char)); // abs. path begin with "/"        
     } else { // trim out the last entry(new dir), concat the splited entries back to string 
         strncpy(buf,"/", sizeof(char)); // abs. path begin with "/"        
         for(int i=0; i<count_split; i++){            
@@ -168,9 +179,8 @@ int main(int argc, char *argv[]){
         /* after got the parent path, now use open_t to get the inode# for ".." */
         parent_inode = open_t(buf+1, 2); // buf+1 for ignore 1st "/", flag is 2 for existing dir
     }
-    //printf("p_n: %d\n",parent_inode);
+    //printf("p_n: %d\n",parent_inode);    
     
-        
     makedir(fd, &sb, &inodes, dir_name, parent_inode);
     
     return 0;    
