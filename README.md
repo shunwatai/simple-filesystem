@@ -2,7 +2,7 @@
 
 ##This homework not finish yet, and I may not finish it. Also, many bugs + unreadable codes
 
-###All the mkdir_, external_cp etc. are only used one direct data block only, 2nd direct blk and the indirect blk are not implement to use yet
+###All the mkdir_t, external_cp etc. are only used one direct data block only, 2nd direct blk and the indirect blk are not implementd to use yet, so the file should not greater than 4096bytes
 
 ####t_shell NOT develop yet
 
