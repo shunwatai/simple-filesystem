@@ -199,8 +199,8 @@ int print_sb(struct superblock sb){ //func. for print out sb info
 /* simple function for print the inode info */
 int print_inode(struct inode inodes){
     printf("-------inode------\n");
-    printf("inode no.: %d\ninode_size: %d\ninode_type: %d\ninode_direct_blk: %d\ntime: %s",
-            inodes.i_number, inodes.i_size, inodes.i_type, inodes.direct_blk[0], ctime(&inodes.i_mtime));
+    printf("inode no.: %d\ninode_size: %d\ninode_blocks:%d\ninode_type: %d\ninode_direct_blk: %d\ntime: %s",
+            inodes.i_number, inodes.i_size, inodes.i_blocks, inodes.i_type, inodes.direct_blk[0], ctime(&inodes.i_mtime));
     printf("------------------\n");
     return 0;
 }
