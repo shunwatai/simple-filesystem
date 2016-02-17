@@ -7,8 +7,8 @@
 #include <stdlib.h>    // for malloc
 #include <string.h>    // for strlen
 
-#include "../sfs.h"
-#include "../sfs_functions/sys_call.h"
+#include "../sfs.h"    // SFS structures provided by ar sir
+#include "../sfs_functions/sys_call.h" // header file that included this open_t for user commands
 
 /*
  # overall tasks that mkdir performs:
