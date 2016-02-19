@@ -4,6 +4,14 @@
 
 ###All the mkdir_t, external_cp etc. are only used one direct data block only, 2nd direct blk and the indirect blk are not implementd to use yet, so the file should not greater than 4096bytes
 
+####my steps to do this shit:
+1. make the mkfs_t.c, form the layout of HD
+2. in the mkfs_t, also make the "root" directory on inode#0 at the end of execution
+3. work on the open_t.c for get the inode number. Test it by found the inode# of root dir
+4. work on ls_t.c for list the entries of dir according the inode# return from open_t. I followed the sample code of getdents(), type ```man 2 getdents()``` in terminal.
+5. work on mkdir_t.c
+6. work on external_cp.c & write_t.c
+
 ####notice:
 1. t_shell NOT develop yet
 2. cp_t, cd_t, cat_t, read_t are not start to do yet
@@ -11,8 +19,9 @@
 4. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
 
 ####TODO:
-- [ ] make the read_t.c
-- [ ] make the cat_t.c
+- [ ] read_t.c
+- [ ] cat_t.c
+- [ ] tshell.c
 
 run the buildHD.sh to make the 110M fake "harddisk" and form the layout of
 superblock, inode table, datablocks
