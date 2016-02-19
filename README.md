@@ -61,6 +61,7 @@ Now try to ls, "./ls_t /":
     #0         0      32              ..            Thu Feb 18     01:00:06 2016
 
 make a directory:
+
     ./mkdir_t /test_dir
     entry[0]: test_dir
     path splited: 1
