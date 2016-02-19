@@ -12,7 +12,7 @@
 /*********************************************************************/
 // create superblock
 static int create_superblk(int fd){ 
-    struct superblock sb; // set all the superblock variables
+    struct superblock sb={}; // set all the superblock variables
     sb.inode_offset = INODE_OFFSET;
     sb.data_offset = DATA_OFFSET;
     sb.max_inode = MAX_INODE;
@@ -28,14 +28,14 @@ static int create_superblk(int fd){
 
     ssize_t ret;
     lseek(fd, SB_OFFSET, SEEK_SET);
-    ret = write( fd, &sb, INODE_OFFSET-SB_OFFSET ); //write the superblock region 4096-512
+    ret = write( fd, &sb, sizeof(sb) ); //write the superblock region 4096-512
     printf("SB write %zdBytes\n", ret);
-    if( ret != INODE_OFFSET-SB_OFFSET ){
+    if( ret != sizeof(sb) ){
         printf("bytes written [%d] are not equal to the default block size\n", (int)ret);
         return -1;
     }
     printf("Super block written succesfully\n------\n");
-    return 0;
+    return ret;
 }
 
 /* create inode table */
@@ -44,49 +44,49 @@ static int create_inode_table(int fd){
 
     int num_inodes = MAX_INODE; // set maximum 100 inodes
     printf("total inodes: %d\n",num_inodes);
-	//struct inode inodes; // 
+	struct inode inodes = {0};  // initialise a inode struct
 
-    //lseek(fd, INODE_OFFSET, SEEK_SET); // seek to first inode offset 4096
+    lseek(fd, INODE_OFFSET, SEEK_SET); // seek to first inode offset 4096
     for(int i=0; i<num_inodes; i++){ 
-        struct inode inodes; //        
-        inodes.i_number = i;        
-        //ret += write(fd, inodes[i], sizeof(struct inode));
-        ret += write(fd, &inodes, BLOCK_SIZE);  
+        //struct inode inodes = {}; //        
+        inodes.i_number = i;                
+        ret += write(fd, &inodes, sizeof(struct inode));  
     }
 
-    printf("inode wrote ret: %zd\n", ret);
+    printf("size of each inode %lu x 100 return: %zdbytes\n", sizeof(struct inode), ret);
 
-	if (ret != num_inodes*BLOCK_SIZE) {
+	if (ret != num_inodes*sizeof(struct inode)) {
 		perror("The inode store was not written properly. Retry your mkfs");
 		return -1;
 	}
 
-	printf("inode region written succesfully\n------\n");
-	return 0;
+	printf("inode region written succesfully\n------\n");        
+	return ret;
 }
 
 /* create all the available 4K blocks */
 static int create_blocks(int fd){
     ssize_t ret=0;
-    char *block[MAX_DATA_BLK];
-
-    //ret = write(fd, &block, sizeof(int)*1024*3840);
+    //char *block[MAX_DATA_BLK];
+    char block[BLOCK_SIZE] = "";
+    printf("write %lu blk size into disk...\n", sizeof(block));
+    
     lseek(fd, DATA_OFFSET, SEEK_SET);
     for(int i=0; i<MAX_DATA_BLK; i++){
-        block[i] = malloc(sizeof(int)*1024);
-        ret += write(fd, &block[i], sizeof(int)*1024);
-        free(block[i]);
+        //block[i] = malloc(BLOCK_SIZE);
+        ret += write(fd, &block, BLOCK_SIZE);
+        //free(block[i]);
     }
     int totalblk = ret/(1024*4);
     printf("totalblk: %d,write: %zdBytes\n------\n",totalblk,ret);
 
-    return 0;
+    return ret;
 }
 
 /* testing function for create a root dir on the first inode and data blk */
 static int createrootdir(int fd){    
-    struct superblock sb; // get the sperblock info.
-    struct inode inodes;  // get the inodes info.    
+    struct superblock sb = {0}; // get the sperblock info.
+    struct inode inodes = {0};  // get the inodes info.    
     ssize_t ret=0; // return size of bytes
     
     lseek(fd, SB_OFFSET, SEEK_SET); // goto region of sb
@@ -112,42 +112,47 @@ static int createrootdir(int fd){
     inodes.file_num = 2; // "." & ".."
 
     lseek(fd, -ret, SEEK_CUR); // seek back to available inode for update
-    if( write(fd, &inodes, BLOCK_SIZE) != BLOCK_SIZE ){ // update inode info.
+    if( (ret=write(fd, &inodes, sizeof(inodes))) != sizeof(inodes) ){ // update inode info.
         perror("inode update failed");
         return -1;
     }
     
-    DIR_NODE curdir = {".", inodes.i_number}; // init dir struct (name + inode num)
-    DIR_NODE parentdir = {"..", inodes.i_number}; // init dir struct (name + inode num)
+    DIR_NODE curdir = {}; // init dir struct (name + inode num)
+    strncpy(curdir.dir,".",sizeof(DIR_NODE));
+    curdir.inode_number = inodes.i_number;
+    
+    DIR_NODE parentdir = {}; // init dir struct (name + inode num)
+    strncpy(parentdir.dir,"..",sizeof(DIR_NODE));
+    parentdir.inode_number = inodes.i_number;
     //printf("sizeof(. ..): %lu %lu\n",sizeof(curdir),sizeof(parentdir));
     
     lseek(fd, inodes.direct_blk[0], SEEK_SET); // goto offset of blk to be written
-    if( write(fd, &curdir, sizeof(curdir)) != sizeof(curdir) ){ // write dir entry
+    if( (ret=write(fd, &curdir, sizeof(curdir))) != sizeof(DIR_NODE) ){ // write dir entry
         perror("entry write failed");
         return -1;
     }
-    if( write(fd, &parentdir, sizeof(parentdir)) != sizeof(parentdir) ){ // write dir entry
+    if( (ret=write(fd, &parentdir, sizeof(parentdir))) != sizeof(DIR_NODE) ){ // write dir entry
         perror("entry write failed");
         return -1;
     }
     printf("root dir created.\n");
     
     /* after all the writes of inode and blk, update their next available var */
-    sb.next_available_blk = sb.next_available_blk + BLOCK_SIZE; // add 4K offset
-    sb.next_available_inode = sb.next_available_inode + BLOCK_SIZE; // add 4K offset
-    lseek(fd, 512, SEEK_SET); // go to sb region
-    if( write(fd, &sb, INODE_OFFSET-SB_OFFSET) != INODE_OFFSET-SB_OFFSET ){ // update the superblock info
+    sb.next_available_blk = sb.next_available_blk + BLOCK_SIZE; // increase 4K offset for data blk
+    sb.next_available_inode = sb.next_available_inode + sizeof(struct inode); // increase sizeof(struct inode) offset
+    lseek(fd, SB_OFFSET, SEEK_SET); // go to sb region
+    if( (ret=write(fd, &sb, sizeof(sb))) != sizeof(sb) ){ // update the superblock info
         perror("SB update failed");
         return -1;
     }
-    return 0;
+    return ret;
 }
 
 int main(int argc, char *argv[]){
     printf("mkfs_t testing....\n");
     int fd;
     ssize_t ret;
-    char boot[512]="boot sector"; // useless boot region 512Bytes
+    char boot[512]="booting Simple File System...\nThis assginment is initialised by Tai Shun Wa"; // useless boot region 512Bytes
 
     if (argc != 2) {
         printf("Usage: mkfs_t <HD>\n");
@@ -161,12 +166,28 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-    write( fd, &boot, sizeof(boot) ); // write first 512Bytes for boot
+    ret = write( fd, &boot, sizeof(boot) ); // write first 512Bytes for boot
+    if(ret!=sizeof(boot)){
+        perror("failed to write boot sector");
+        return -1;
+    }
     printf("boot write at the beginning %luB\n------\n", sizeof(boot));
 
-    create_superblk(fd);
-    create_inode_table(fd); 
+    ret = create_superblk(fd);
+    if(ret==-1){        
+        return ret;
+    }
+    
+    ret = create_inode_table(fd); 
+    if(ret==-1){
+        return ret;
+    }
+    
     create_blocks(fd);    
+    if(ret==-1){
+        return ret;
+    }
+    
     createrootdir(fd);
 
     close(fd);

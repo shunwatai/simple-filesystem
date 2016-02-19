@@ -32,7 +32,7 @@ int main(int argc, char* argv[]){
     ssize_t size = st.st_size; // get the size    
     //printf("size of src file: %zd\n",size); 
     
-    char *buf=malloc(size); // allocate memory to buf to store the string in file
+    char *buf=""; // allocate memory to buf to store the string in file   
     ret = read(src, buf, size); // read the file to buf
     
     /* just print out the text from file */
@@ -42,19 +42,20 @@ int main(int argc, char* argv[]){
     }   
         
     /* now read out the superblock for available inode and datablk to write */
-    struct superblock sb;
+    struct superblock sb={};
     lseek(fd, SB_OFFSET, SEEK_SET); // goto superblk region
     ret = read(fd, &sb, sizeof(struct superblock)); // read superblk info. to sb
-    print_sb(sb);
+    //print_sb(sb);
     
     /* get the inode number. I try to calculate the inode# on9ly 
      * instead of get that inode info directly.(I initialed 0-99 inode# when run the mkfs_t) */
-    int inode_num = sb.next_available_inode / INODE_OFFSET - 1;
-    //printf("the external file will use inode#%d\n",inode_num);
+    int inode_num = (sb.next_available_inode-INODE_OFFSET) / sizeof(struct inode);
+    printf("the external file will use inode#%d\n",inode_num);
     
-    /* write */    
-    ret = write_t(inode_num, sb.next_available_blk, buf, strlen(buf));
-    if(ret!=strlen(buf)){
+    /* use sys_call function write_t to alocate new inode for the file and update sb info. */      
+    //print_sb(sb);
+    ret = write_t(inode_num, sb.next_available_blk, buf, size);
+    if(ret!=size){
         perror("write_t failed");
     }
    
@@ -66,25 +67,27 @@ int main(int argc, char* argv[]){
     int dir_inode = open_t(dpath,2); // get inode number of that dir
     //printf("inode of dir: %d\n",dir_inode);
     
-    struct inode inodes;
-    lseek(fd,INODE_OFFSET+(INODE_OFFSET*dir_inode),SEEK_SET); // seek to dir inode offset
+    /* add the copied file into the directory entry */
+    struct inode inodes={};
+    lseek(fd,INODE_OFFSET+sizeof(struct inode)*dir_inode,SEEK_SET); // seek to dir inode offset
     ret = read(fd, &inodes, sizeof(struct inode)); // read inode info to inodes
     
-    lseek(fd, inodes.direct_blk[0]+inodes.i_size, SEEK_SET); // goto writable offset of datablk
+    lseek(fd, inodes.direct_blk[0]+sizeof(DIR_NODE)*inodes.file_num, SEEK_SET); // goto writable offset of datablk
     //char *filename = argv[1];
-    DIR_NODE entry;
-    strncpy(entry.dir, argv[1], sizeof(entry.dir)); // new dir name
-    entry.inode_number=inode_num; // new dir inode number
+    DIR_NODE entry={}; // for the new file
+    strncpy(entry.dir, argv[1], sizeof(entry.dir)); // new file name
+    entry.inode_number=inode_num; // new file inode number
     
-    ret = write(fd, &entry, sizeof(DIR_NODE));
+    ret = write(fd, &entry, sizeof(DIR_NODE));  // write new entry into the directory
     
-    inodes.i_size = inodes.i_size + strlen(buf);
-    inodes.file_num = inodes.file_num + 1;
+    inodes.i_size = inodes.i_size + size; 
+    inodes.file_num = inodes.file_num + 1;    
     
+    lseek(fd,INODE_OFFSET+sizeof(struct inode)*dir_inode,SEEK_SET);
+    ret = write(fd, &inodes, sizeof(struct inode));
     
-    lseek(fd,INODE_OFFSET+(INODE_OFFSET*dir_inode),SEEK_SET);
-    ret = write(fd, &inodes, BLOCK_SIZE);
-    
-    free(buf);
+    //print_inode(inodes);
+    //print_sb(sb);
+
     close(fd);
 }

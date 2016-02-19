@@ -27,7 +27,7 @@ int open_t(const char *path, int flags){ // path start at root dir & flags
         return -1;
     }
 
-    // read boot sector (useless)
+    /* read boot sector (useless) */
     char boot[512]; // useless boot sector
     ret = read(fd, &boot, sizeof(boot)); // read it out
     if( ret!=sizeof(boot) ){
@@ -37,9 +37,9 @@ int open_t(const char *path, int flags){ // path start at root dir & flags
         //printf("boot: %s\n---\n", boot); // print useless boot message
     }
 
-    // read superblock
+    /* read superblock */
     //lseek(fd, 512, SEEK_SET); // go to 512byte(start of sb region)
-    struct superblock sb; // superblock
+    struct superblock sb = {}; // superblock
     ret = read(fd, &sb, sizeof(sb)); // read superblock info.
     if(ret!=sizeof(sb)){
         perror("could not read sb info");
@@ -48,7 +48,7 @@ int open_t(const char *path, int flags){ // path start at root dir & flags
 
     // read 1st inode for root dir
     lseek(fd, INODE_OFFSET, SEEK_SET); // go to 4096byte(start of inodes region)
-    struct inode inodes; // inodes
+    struct inode inodes = {}; // inodes
     read(fd, &inodes, sizeof(inodes));
     //print_inode(inodes); // pri    // print out the splited abs path
     // i = 0;
@@ -60,8 +60,8 @@ int open_t(const char *path, int flags){ // path start at root dir & flags
 
     /* read directory entry (maybe for ls command) */
 /*
-    char buf[BLOCK_SIZE]; // buffer for read a 4K block
-    DIR_NODE *dir_entries; // ptr point to address of entry
+    char buf[BLOCK_SIZE]=""; // buffer for read a 4K block
+    DIR_NODE *dir_entries={}; // ptr point to address of entry
     if(inodes.i_size/4096<=1) // <=1 1blk, >1 use indirect blk
     lseek(fd, inodes.direct_blk[0], SEEK_SET); // go to that data block by offset, read the real data
     ret = read(fd, &buf, sizeof(buf));
@@ -88,7 +88,7 @@ int open_t(const char *path, int flags){ // path start at root dir & flags
 */
 
     // read the abs path and split them in entry_name
-    char *entry_name[MAX_NESTING_DIR]; // separate the path by "/" and save, most dir nest 10.
+    char *entry_name[MAX_NESTING_DIR]={}; // separate the path by "/" and save, most dir nest 10.
     split_path((char*)path+1, entry_name); // split the path into entry_name array,
                                            // path+1 for ignore the first "/" since the HD not mount on "/"
     /* print out the splited abs path */

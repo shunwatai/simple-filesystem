@@ -12,30 +12,35 @@
 /* THis ls function is based on the getdents(), "man 2 getdents" to read the example */
 int ls(int fd, struct inode inodes){
     ssize_t ret = 0; // return byte size of read/write
-    char buf[BLOCK_SIZE]; // buffer for read a 4K block of an inode
+    char buf[BLOCK_SIZE]=""; // buffer for read a 4K direct block of an inode
     DIR_NODE *dir_entries; // ptr point to address of entry
     //if(inodes.i_size/4096<=1) // <=1 1blk, >1 use indirect blk
+    
     lseek(fd, inodes.direct_blk[0], SEEK_SET); // go to that data block by offset, read the real data
     ret = read(fd, &buf, sizeof(buf));
-
+    //int test = inodes.direct_blk[0];
+    
     printf("inode#\ttype\tsize\t\tname\t\tcreate on\n"); // print useless title on top
     printf("=========================================================\n");
     int entry = 0; // 1st entry start at 0
     while(entry < ret){ // while less than read buffer(4K)
+        //printf("accessing: %d\n",test);
         dir_entries = (DIR_NODE*)(buf+entry); // cast that buf to DIR_NODE
         if(!*dir_entries->dir){break;} // check if the entry is empty
-        struct inode one_entry;
-        int i_offset = dir_entries->inode_number*INODE_OFFSET; // inode offset
+        struct inode ls_inode; // list the entries according to that inode number
+        int i_offset = dir_entries->inode_number*sizeof(struct inode); // inode offset
+        
         lseek(fd, INODE_OFFSET+i_offset, SEEK_SET); // goto that inode offset
-        read(fd, &one_entry, sizeof(struct inode)); // read that inode to one_entry
-        //print_inode(one_entry);
+        read(fd, &ls_inode, sizeof(struct inode)); // read that inode to ls_inode
+        //print_inode(ls_inode);
         printf("#%d %9d %7d %15s %36s",
                 dir_entries->inode_number,
-                one_entry.i_type,
-                one_entry.i_size,
+                ls_inode.i_type,
+                ls_inode.i_size,
                 dir_entries->dir,
-                ctime(&one_entry.i_mtime));
+                ctime(&ls_inode.i_mtime));
         entry = entry + sizeof(DIR_NODE);
+        //test = test + sizeof(DIR_NODE);
     }
 
     return 0;
@@ -62,13 +67,13 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-    int offset = INODE_OFFSET * inum; // 4096 * inode_number = offset
+    int offset = sizeof(struct inode) * inum; // sizeof(inode) * inode_number = offset
 
     //printf("inum: %d\n",inum);
 
     /* after get the inode# from open_t, now list the dir entries by ls() according to that inode# */
     int fd; // for open HD
-    struct inode inodes; // for store the inode info.
+    struct inode inodes={}; // for store the inode info.
     ssize_t ret = 0; // get byte size of read/write
 
     fd = open("../HD", O_RDWR); // open HD
