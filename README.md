@@ -8,7 +8,7 @@
 1. make the ```mkfs_t.c```, form the layout of HD
 2. in the ```mkfs_t```, also make the "root" directory on inode#0 at the end of execution
 3. work on the ```open_t.c``` for get the inode number. Test it by found the inode# of root dir
-4. work on ```ls_t.c``` for list the entries of dir according the inode# return from ```open_t```. I followed the sample code of getdents(), type ```man 2 getdents()``` in terminal.
+4. work on ```ls_t.c``` for list the entries of dir according its inode# return from ```open_t```. I followed the sample code of getdents(), type ```man 2 getdents``` in terminal.
 5. work on ```mkdir_t.c```
 6. work on ```external_cp.c``` & ```write_t.c```
 
@@ -62,9 +62,9 @@ Now try to ls, "./ls_t /":
 
 make a directory:
     ./mkdir_t /test_dir
-      entry[0]: test_dir
-      path splited: 1
-      new dir test_dir wrote on inode#1.
+    entry[0]: test_dir
+    path splited: 1
+    new dir test_dir wrote on inode#1.
 
 ls again:
 
