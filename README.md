@@ -8,7 +8,7 @@
 1. make the ```mkfs_t.c```, form the layout of HD
 2. in the ```mkfs_t```, also make the "root" directory on inode#0 at the end of execution
 3. work on the ```open_t.c``` for get the inode number. Test it by found the inode# of root dir
-4. work on ```ls_t.c``` for list the entries of dir according the inode# return from open_t. I followed the sample code of getdents(), type ```man 2 getdents()``` in terminal.
+4. work on ```ls_t.c``` for list the entries of dir according the inode# return from ```open_t```. I followed the sample code of getdents(), type ```man 2 getdents()``` in terminal.
 5. work on ```mkdir_t.c```
 6. work on ```external_cp.c``` & ```write_t.c```
 
@@ -23,10 +23,11 @@
 - [ ] cat_t.c
 - [ ] tshell.c
 
-run the buildHD.sh to make the 110M fake "harddisk" and form the layout of
-superblock, inode table, datablocks
+####quick demo:
 
-compile the files play with them:
+You can just use ```gcc``` instead of ```clang``` as the compiler
+
+```buildHD.sh``` just a shortcut for make the 110M HD and compile and execute ```mkfs_t```:
 
     ./buildHD.sh
 
