@@ -5,12 +5,12 @@
 ###All the mkdir_t, external_cp etc. are only used one direct data block only, 2nd direct blk and the indirect blk are not implementd to use yet, so the file should not greater than 4096bytes
 
 ####my steps to do this shit:
-1. make the mkfs_t.c, form the layout of HD
-2. in the mkfs_t, also make the "root" directory on inode#0 at the end of execution
-3. work on the open_t.c for get the inode number. Test it by found the inode# of root dir
-4. work on ls_t.c for list the entries of dir according the inode# return from open_t. I followed the sample code of getdents(), type ```man 2 getdents()``` in terminal.
-5. work on mkdir_t.c
-6. work on external_cp.c & write_t.c
+1. make the ```mkfs_t.c```, form the layout of HD
+2. in the ```mkfs_t```, also make the "root" directory on inode#0 at the end of execution
+3. work on the ```open_t.c``` for get the inode number. Test it by found the inode# of root dir
+4. work on ```ls_t.c``` for list the entries of dir according the inode# return from open_t. I followed the sample code of getdents(), type ```man 2 getdents()``` in terminal.
+5. work on ```mkdir_t.c```
+6. work on ```external_cp.c``` & ```write_t.c```
 
 ####notice:
 1. t_shell NOT develop yet
