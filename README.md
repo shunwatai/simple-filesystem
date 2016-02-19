@@ -19,8 +19,16 @@
 4. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
 
 ####TODO:
+- [x] mkfs_t.c
+- [x] open_t.c
+- [x] ls_t.c
+- [x] mkdir_t.c
+- [x] external_cp.c
+- [x] write_t.c
 - [ ] read_t.c
 - [ ] cat_t.c
+- [ ] cd_t.c
+- [ ] cp_t.c
 - [ ] tshell.c
 
 ####quick demo:
