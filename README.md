@@ -4,9 +4,15 @@
 
 ###All the mkdir_t, external_cp etc. are only used one direct data block only, 2nd direct blk and the indirect blk are not implementd to use yet, so the file should not greater than 4096bytes
 
-####t_shell NOT develop yet
-####cp_t, cd_t, cat_t, read_t are not start to do yet
-####all the command must use absolute path to execute
+####notice:
+1. t_shell NOT develop yet
+2. cp_t, cd_t, cat_t, read_t are not start to do yet
+3. all the command must use absolute path to execute
+4. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
+
+####TODO:
+- [ ] make the read_t.c
+- [ ] make the cat_t.c
 
 run the buildHD.sh to make the 110M fake "harddisk" and form the layout of
 superblock, inode table, datablocks
