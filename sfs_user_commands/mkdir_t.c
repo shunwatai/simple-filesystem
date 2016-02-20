@@ -113,8 +113,13 @@ int main(int argc, char *argv[]){
         printf("usage: mkdir_t <dir_name>\n");
         return -1;
     }
-    if(strncmp(argv[1],"/",sizeof(int)) == 0){
+    char *path = argv[1];
+    if(strncmp(&path[0],"/",sizeof(int)) == 0){
         printf("'/' root dir already existing, cannot mkdir\n");
+        return -1;
+    }
+    if(path[0]!='/'){
+        printf("please use absolute path\n");
         return -1;
     }
 
