@@ -33,7 +33,7 @@ int main(int argc, char* argv[]){
     //printf("size of src file: %zd\n",size); 
     
     //char buf[size]; // allocate memory to buf to store the string in file   
-    char *buf=malloc(size+1);
+    char *buf=malloc(size+1); // +1 for null char
     ret = read(src, buf, size); // read the file to buf
     
     /* just print out the text from file */
@@ -54,9 +54,11 @@ int main(int argc, char* argv[]){
     printf("the external file will use inode#%d\n",inode_num);
     
     /* use sys_call function write_t to alocate new inode for the file and update sb info. */      
-    //print_sb(sb);
-    ret = write_t(inode_num, sb.next_available_blk, buf, size);
+    char fname[1024]=""; // store the file name
+    strncpy(fname, buf, size); 
+    ret = write_t(inode_num, sb.next_available_blk, &fname, size);
     free(buf);
+    
     if(ret!=size){
         perror("write_t failed");
     }
@@ -90,7 +92,6 @@ int main(int argc, char* argv[]){
     
     //print_inode(inodes);
     //print_sb(sb);
-    
-    //free(buf);
+
     close(fd);
 }
