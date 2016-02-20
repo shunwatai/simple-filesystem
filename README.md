@@ -6,15 +6,16 @@
 1. for the open_t.c, it is very mess. Also, I DID NOT(forgot) use the parameter "flags", actually I think if flags=0 run create file func.; if flags=1 run make directory func.; if flags=2 run read file func. However, I just put those func directly in externt_cp, mkdir_t, cat_t....
 2. must use absolute path on the SFS
 3. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
-4. 
+4. only used one direct data block, 2nd direct blk and the indirect blk are not implemented yet, so DO NOT copy file that greater than 4096bytes
 
 ####my steps to do this shit:
-1. make the ```mkfs_t.c```, form the layout of HD
-2. in the ```mkfs_t```, also make the "root" directory on inode#0 at the end of execution
-3. work on the ```open_t.c``` for get the inode number. Test it by found the inode# of root dir
-4. work on ```ls_t.c``` for list the entries of dir according its inode# return from ```open_t```. I followed the sample code of getdents(), type ```man 2 getdents``` in terminal.
-5. work on ```mkdir_t.c```
-6. work on ```external_cp.c``` & ```write_t.c```
+1. made the ```mkfs_t.c```, form the layout of HD
+2. in the ```mkfs_t```, also made the "root" directory on inode#0 at the end of execution
+3. worked on the ```open_t.c``` for get the inode number. Test it by found the inode# of root dir
+4. worked on ```ls_t.c``` for list the entries of dir according its inode# return from ```open_t```. I followed the sample code of getdents(), type ```man 2 getdents``` in terminal.
+5. worked on ```mkdir_t.c```
+6. worked on ```external_cp.c``` & ```write_t.c```
+7. worked on ```cat_t.c``` & ```read_t.c```
 
 
 ####TODO:
