@@ -32,13 +32,14 @@ int main(int argc, char* argv[]){
     ssize_t size = st.st_size; // get the size    
     //printf("size of src file: %zd\n",size); 
     
-    char *buf=""; // allocate memory to buf to store the string in file   
+    //char buf[size]; // allocate memory to buf to store the string in file   
+    char *buf=malloc(size+1);
     ret = read(src, buf, size); // read the file to buf
     
     /* just print out the text from file */
     printf("buf: ");
     for(int i=0; i<ret; i++){
-        printf("%c",buf[i]);
+        printf("%c ",buf[i]);
     }   
         
     /* now read out the superblock for available inode and datablk to write */
@@ -55,6 +56,7 @@ int main(int argc, char* argv[]){
     /* use sys_call function write_t to alocate new inode for the file and update sb info. */      
     //print_sb(sb);
     ret = write_t(inode_num, sb.next_available_blk, buf, size);
+    free(buf);
     if(ret!=size){
         perror("write_t failed");
     }
@@ -62,7 +64,7 @@ int main(int argc, char* argv[]){
     /* after write_t success, add the new entry to the dir according to the arg[2](destination) */
     char *dpath;
     if(strncmp(argv[2],"/",sizeof(int)) == 0){ // because of my on9 coding, just a alias from "/" -> "/."
-        dpath = "/."; // convert "/" to "/."
+        dpath = "/."; // change "/" to "/."
     }
     int dir_inode = open_t(dpath,2); // get inode number of that dir
     //printf("inode of dir: %d\n",dir_inode);
@@ -88,6 +90,7 @@ int main(int argc, char* argv[]){
     
     //print_inode(inodes);
     //print_sb(sb);
-
+    
+    //free(buf);
     close(fd);
 }

@@ -9,8 +9,10 @@
 #include "../sfs.h"    // SFS structures provided by ar sir
 #include "sys_call.h"  // header file that included this read_t for user commands
 
-int write_t(int inode_number, int offset, void *buf, int count){        
-    //printf("inode#%d\noffset: %d\nbuf: %scount: %d\n",inode_number,offset,buf,count);
+/* inode_number & offset are the available for write. 
+ * buf & count are the file content and size in bytes to be written */
+int write_t(int inode_number, int offset, void *buf, int count){      
+    //printf("inode#%d\noffset: %d\nbuf: %s\ncount: %d\n",inode_number,buf,dllm,count);
     //printf("=====================\n");
     ssize_t ret=0; // get bytes of read/write
     
@@ -47,12 +49,22 @@ int write_t(int inode_number, int offset, void *buf, int count){
     //print_inode(inodes);  // see the inode result
     
     /* write to the data blk */
-    lseek(fd, inodes.direct_blk[0], SEEK_SET); // go to the data blk region
+    lseek(fd, inodes.direct_blk[0], SEEK_SET); // go to the data blk region    
     ret = write(fd, buf, count); // write buf to data blk
     if(ret!=count){
         perror("write failed");
         return -1;
     }
+    
+    /* testing: read the data blk and display the message */
+    //char test[count];
+    //lseek(fd, inodes.direct_blk[0], SEEK_SET);
+    //ret = read(fd,test,count);
+        //if(ret!=count){
+        //perror("read failed");
+        //return -1;
+    //}
+    //printf("test: %s",test);
     
     /* update inode info */   
     lseek(fd, inode_offset, SEEK_SET);
