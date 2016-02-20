@@ -67,9 +67,11 @@ int main(int argc, char* argv[]){
     char *dpath;
     if(strncmp(argv[2],"/",sizeof(int)) == 0){ // because of my on9 coding, just a alias from "/" -> "/."
         dpath = "/."; // change "/" to "/."
+    }else{
+        dpath = argv[2]; // assign the complete path
     }
     int dir_inode = open_t(dpath,2); // get inode number of that dir
-    //printf("inode of dir: %d\n",dir_inode);
+    printf("inode of dir: %d\n",dir_inode);
     
     /* add the copied file into the directory entry */
     struct inode inodes={};

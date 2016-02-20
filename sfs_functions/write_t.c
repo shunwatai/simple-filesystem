@@ -12,7 +12,7 @@
 /* inode_number & offset are the available for write. 
  * buf & count are the file content and size in bytes to be written */
 int write_t(int inode_number, int offset, void *buf, int count){      
-    printf("inode#%d\noffset: %d\nbuf: %scount: %d\n",inode_number,offset,buf,count);
+    //printf("inode#%d\noffset: %d\nbuf: %scount: %d\n",inode_number,offset,buf,count);
     //printf("=====================\n");
     ssize_t ret=0; // get bytes of read/write
     
@@ -85,7 +85,6 @@ int write_t(int inode_number, int offset, void *buf, int count){
     
     sb.next_available_inode = sb.next_available_inode + sizeof(struct inode);
     sb.next_available_blk = sb.next_available_blk + BLOCK_SIZE;
-    //printf("in write_t\n");
     //print_sb(sb);
     
     lseek(fd, SB_OFFSET, SEEK_SET);
@@ -95,6 +94,6 @@ int write_t(int inode_number, int offset, void *buf, int count){
         return -1;
     }
     
-    close(fd);
+    close(fd);    
     return count;
 }
