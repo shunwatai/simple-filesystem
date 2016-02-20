@@ -57,36 +57,6 @@ int open_t(const char *path, int flags){ // path start at root dir & flags
         //i = i + 1;
     //}nt inode info
 
-
-    /* read directory entry (maybe for ls command) */
-/*
-    char buf[BLOCK_SIZE]=""; // buffer for read a 4K block
-    DIR_NODE *dir_entries={}; // ptr point to address of entry
-    if(inodes.i_size/4096<=1) // <=1 1blk, >1 use indirect blk
-    lseek(fd, inodes.direct_blk[0], SEEK_SET); // go to that data block by offset, read the real data
-    ret = read(fd, &buf, sizeof(buf));
-
-    printf("inode#\ttype\tsize\tname\t\tcreate on\n"); // print useless title on top
-    printf("=========================================\n");
-    int entry = 0; // 1st entry start at 0
-    while(entry < ret){ // while less than read buffer(4K)
-        dir_entries = (DIR_NODE*)(buf+entry); // cast that buf to DIR_NODE
-        if(!*dir_entries->dir){break;} // check if the entry is empty
-        struct inode one_entry;
-        int i_offset = dir_entries->inode_number*INODE_OFFSET; // inode offset
-        lseek(fd, INODE_OFFSET+i_offset, SEEK_SET); // goto that inode offset
-        read(fd, &one_entry, sizeof(struct inode)); // read that inode to one_entry
-        //print_inode(one_entry);
-        printf("#%d %9d %7d %7s %36s",
-                dir_entries->inode_number,
-                one_entry.i_type,
-                one_entry.i_size,
-                dir_entries->dir,
-                ctime(&one_entry.i_mtime));
-        entry = entry + sizeof(DIR_NODE);
-    }
-*/
-
     // read the abs path and split them in entry_name
     char *entry_name[MAX_NESTING_DIR]={}; // separate the path by "/" and save, most dir nest 10.
     split_path((char*)path+1, entry_name); // split the path into entry_name array,
