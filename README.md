@@ -2,7 +2,11 @@
 
 ##This homework not finish yet, and I may not finish it. Also, many bugs + unreadable codes
 
-###All the mkdir_t, external_cp etc. are only used one direct data block only, 2nd direct blk and the indirect blk are not implementd to use yet, so the file should not greater than 4096bytes
+###important notice:
+1. for the open_t.c, it is very mess. Also, I DID NOT(forgot) use the parameter "flags", actually I think if flags=0 run create file func.; if flags=1 run make directory func.; if flags=2 run read file func. However, I just put those func directly in externt_cp, mkdir_t, cat_t....
+2. must use absolute path on the SFS
+3. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
+4. 
 
 ####my steps to do this shit:
 1. make the ```mkfs_t.c```, form the layout of HD
@@ -12,11 +16,6 @@
 5. work on ```mkdir_t.c```
 6. work on ```external_cp.c``` & ```write_t.c```
 
-####notice:
-1. t_shell NOT develop yet
-2. cp_t, cd_t, cat_t, read_t are not start to do yet
-3. all the command must use absolute path to execute
-4. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
 
 ####TODO:
 - [x] mkfs_t.c
