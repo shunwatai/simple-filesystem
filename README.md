@@ -52,7 +52,7 @@ compile user commands:
     clang ../sfs_functions/{open_t.o,write_t.o} ls_t.c -o ls_t
     clang ../sfs_functions/{open_t.o,write_t.o} mkdir_t.c -o mkdir_t
     clang ../sfs_functions/{open_t.o,write_t.o} external_cp.c -o external_cp
-    clang ../sfs_functions/{open_t.o,read_t.o} external_cp.c -o external_cp
+    clang ../sfs_functions/{open_t.o,read_t.o} cat_t.c -o cat_t
 
 Now try to ls, "./ls_t /":
 
