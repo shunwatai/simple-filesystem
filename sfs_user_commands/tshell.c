@@ -1,4 +1,4 @@
-/* This piece of code copy from below site:
+/* This piece of code referenced from:
  * http://codereview.stackexchange.com/questions/67746/simple-shell-in-c 
  */
 
@@ -20,27 +20,36 @@ int executeCmd(char** params);
 int main()
 {
     char cmd[MAX_COMMAND_LENGTH + 1];
-    char* params[MAX_NUMBER_OF_PARAMS + 1]
+    char* params[MAX_NUMBER_OF_PARAMS + 1];
 
     while(1) {
-        printf("tshell$ ");
-
+        printf("tshell### ");
+        char prefix[MAX_COMMAND_LENGTH] = "./";       
+        
         // Read command from standard input, exit on Ctrl+D
-        if(fgets(cmd, sizeof(cmd), stdin) == NULL) break;
+        if(fgets(cmd, sizeof(cmd), stdin) == NULL){
+            break;
+        }        
+        
+        strncat(prefix, cmd, sizeof(prefix) - strlen(prefix) - 1);
 
         // Remove trailing newline character, if any
-        if(cmd[strlen(cmd)-1] == '\n') {
-            cmd[strlen(cmd)-1] = '\0';
+        if(prefix[strlen(prefix)-1] == '\n') {
+            prefix[strlen(prefix)-1] = '\0';
         }
 
         // Split cmd into array of parameters
-        parseCmd(cmd, params);
+        parseCmd(prefix, params);
 
         // Exit?
-        if(strcmp(params[0], "exit") == 0) break;
+        if(strcmp(params[0], "exit") == 0){
+            break;
+        }
 
         // Execute command
-        if(executeCmd(params) == 0) break;
+        if(executeCmd(params) == -1){
+            break;
+        }
     }
 
     return 0;
@@ -55,27 +64,29 @@ void parseCmd(char* cmd, char** params)
     }
 }
 
-int executeCmd(char** params)
+int executeCmd(char* params[])
 {
     // Fork process
     pid_t pid = fork();
+    
+    //printf("%s %s\n", params[0], params[1]);
 
     // Error
-    if (pid == -1) {
+    if (pid == -1){
         char* error = strerror(errno);
         printf("fork: %s\n", error);
-        return 1;
+        return -1;
     }
 
     // Child process
     else if (pid == 0) {
         // Execute command
-        execvp(params[0], params);  
+        execvp(params[0], params);  // execute the command
 
         // Error occurred
         char* error = strerror(errno);
         printf("shell: %s: %s\n", params[0], error);
-        return 0;
+        return -1;
     }
 
     // Parent process
@@ -83,6 +94,6 @@ int executeCmd(char** params)
         // Wait for child process to finish
         int childStatus;
         waitpid(pid, &childStatus, 0);
-        return 1;
+        return 0;
     }
 }
