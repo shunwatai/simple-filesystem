@@ -7,6 +7,7 @@
 2. must use absolute path on the SFS
 3. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
 4. only used one direct data block, 2nd direct blk and the indirect blk are not implemented yet, so DO NOT copy file that greater than 4096bytes
+5. the split_path() func. in open_t.c is buggy. I dont know there is a strsep() in C when I doing this homework. I may use strsep() to replace my self-implement split func. if I have time.
 
 ####my steps to do this shit:
 1. made the ```mkfs_t.c```, form the layout of HD
@@ -16,6 +17,7 @@
 5. worked on ```mkdir_t.c```
 6. worked on ```external_cp.c``` & ```write_t.c```
 7. worked on ```cat_t.c``` & ```read_t.c```
+8. find a [sample code](http://www.codereview.stackexchange.com/questions/67746/simple-shell-in-c) for tshell, just modified it a bit to run the user commands in sfs_user_commands folder. Just compile and run the tshell, try to enter the *_t commands without "./" prefix
 
 
 ####TODO:
@@ -29,7 +31,7 @@
 - [x] cat_t.c
 - [ ] cd_t.c
 - [ ] cp_t.c
-- [ ] tshell.c
+- [x] tshell.c
 
 ####quick demo:
 
