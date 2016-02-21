@@ -67,9 +67,8 @@ int main(int argc, char *argv[]){
         return -1;
     }
 
-    int offset = sizeof(struct inode) * inum; // sizeof(inode) * inode_number = offset
-
     //printf("inum: %d\n",inum);
+    int offset = sizeof(struct inode) * inum; // sizeof(inode) * inode_number = offset
 
     /* after get the inode# from open_t, now list the dir entries by ls() according to that inode# */
     int fd; // for open HD
