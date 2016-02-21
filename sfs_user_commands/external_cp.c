@@ -71,7 +71,7 @@ int main(int argc, char* argv[]){
         dpath = argv[2]; // assign the complete path
     }
     int dir_inode = open_t(dpath,2); // get inode number of that dir
-    printf("inode of dir: %d\n",dir_inode);
+    printf("inode of current dir: %d\n",dir_inode);
     
     /* add the copied file into the directory entry */
     struct inode inodes={};
