@@ -141,10 +141,16 @@ int get_inode(int fd, struct inode inodes, char **entry_name){
         if(!*dir_entries->dir){break;} // check if the entry is empty
 
         //printf("%4s @inode#%d\n",dir_entries->dir,dir_entries->inode_number); // print all entries in dir, name + inode#
-        //printf("entry_name[%d]: %s  <=> dir_entries: %s    inode#: %d\n",i,entry_name[i],dir_entries->dir,inum); // see if entry_name exist in dir_entries
+        printf("entry_name[%d]: %s  <=> dir_entries: %s    inode#: %d\n",i,entry_name[i],dir_entries->dir,inum); // see if entry_name exist in dir_entries
         /* on9 inhuman logic created by me. originally for search dir recusively */
         if( strncmp(entry_name[i],dir_entries->dir,sizeof(dir_entries->dir)) == 0 ){ // if match name, update inode
-            inum = dir_entries->inode_number; // update the inode num of that entry
+            inum = dir_entries->inode_number; // update the inode num to that entry
+	    struct inode subdir_inode={};
+	    lseek(fd,INODE_OFFSET+inum*sizeof(struct inode),SEEK_SET); // go to the offset of the sub-directory inode
+	    read(fd,&subdir_inode,sizeof(struct inode)); // read the inode info. to subdir_inode
+	    lseek(fd, subdir_inode.direct_blk[0], SEEK_SET); //seek to the data blk
+	    read(fd, &buf, sizeof(buf)); // read the new directory file entries into buf
+	    entry = 0; // reset entry to 0 for search in new dir
             i = i + 1;
         }
 
