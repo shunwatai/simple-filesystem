@@ -50,12 +50,6 @@ int open_t(const char *path, int flags){ // path start at root dir & flags
     lseek(fd, INODE_OFFSET, SEEK_SET); // go to 4096byte(start of inodes region)
     struct inode inodes = {}; // inodes
     read(fd, &inodes, sizeof(inodes));
-    //print_inode(inodes); // pri    // print out the splited abs path
-    // i = 0;
-    //while( *entry_name[i] ){ // if not empty entry
-        //printf("entry[%d]: %s\n", i, entry_name[i]);
-        //i = i + 1;
-    //}nt inode info
 
     // read the abs path and split them in entry_name
     char *entry_name[MAX_NESTING_DIR]={}; // separate the path by "/" and save, most dir nest 10.
