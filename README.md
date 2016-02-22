@@ -32,6 +32,9 @@
 - [ ] cd_t.c
 - [ ] cp_t.c
 - [x] tshell.c
+- [ ] list the nest dir -> edit get_inode() func. in open_t.c
+- [ ] use 2nd & indirect blk
+- [ ] fix issues on external_cp.c
 
 ####quick demo:
 
