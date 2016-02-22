@@ -57,7 +57,7 @@ static int makedir(int fd, struct superblock *sb, struct inode *inodes, char *di
     //printf("check point 3: write back new inode\n================\n");
     lseek(fd, sb->next_available_inode, SEEK_SET); // goto offset of inode that will be updated
     ret = write(fd, inodes, sizeof(struct inode)); // write new dir info into new inode
-    if(ret!=sizeof(struct inode)){ // if not written 4096 bytes, error
+    if(ret!=sizeof(struct inode)){ // if not written sizeof inode, error
         perror("failed write inodeled to write inode");
         return -1;
     }
@@ -155,12 +155,12 @@ int main(int argc, char *argv[]){
     //print_inode(inodes);
 
     /* get the parent dir inode# */
-    char buf[1024] = "";  // for concat the splited path for get parent inode#. Assume a file/dir name < 1024bytes
+    char buf[1024] = "";  // for concat the splited path for get parent inode#. Assume the full abs. path < 1024characters
     int parent_inode = 0; // get the parent inode number
     int count_split = 0;  // count how many part of the path being splited
     char *entry_name[MAX_NESTING_DIR]; // separate the path by "/" and save, most dir nest 10.
 
-    count_split = split_path(dir_name+1, entry_name) + 1; // split the path into pieces. this func. from open.c
+    count_split = split_path(dir_name+1, entry_name) + 1; // split the path into pieces. this func. from open_t.c
     /* for testing, print all the entries */
     for(int i=0; i<MAX_NESTING_DIR; i++){
         printf("entry[%d]: %s\n",i,entry_name[i]);
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]){
         for(int i=0; i<count_split; i++){
             strncat(buf, entry_name[i], sizeof(entry_name[i])); // start concat the entry_name
             if(i+1 == count_split-1){ // if i+1 is the last of entry_name[](new dir), break
-                dir_name = entry_name[count_split-1];
+                dir_name = entry_name[count_split-1]; // the last element of array is the new dir that will be created
                 break;
             }
             strncat(buf,"/", sizeof(char));

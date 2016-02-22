@@ -13,9 +13,9 @@
 // forward declaration
 int print_inode(struct inode);
 int split_path(char *, char **);
-int get_inode(int , struct inode , char **);
+int get_inode(int , struct inode , char **, int);
 
-/* the open_t functino will open the HD and read out all the sb info.
+/* the open_t function will open the HD and read out all the sb info.
  * and the first inode info. for the entries of root dir.  */
 int open_t(const char *path, int flags){ // path start at root dir & flags
     //printf("path: %s\n", path);
@@ -53,8 +53,8 @@ int open_t(const char *path, int flags){ // path start at root dir & flags
 
     // read the abs path and split them in entry_name
     char *entry_name[MAX_NESTING_DIR]={}; // separate the path by "/" and save, most dir nest 10.
-    split_path((char*)path+1, entry_name); // split the path into entry_name array,
-                                           // path+1 for ignore the first "/" since the HD not mount on "/"
+    int splits = split_path((char*)path+1, entry_name); // split the path into entry_name array,
+                                                        // path+1 for ignore the first "/" since the HD not mount on "/"
     /* print out the splited abs path */
     //int i = 0;
     //while( *entry_name[i] ){ // if not empty entry
@@ -63,7 +63,7 @@ int open_t(const char *path, int flags){ // path start at root dir & flags
     //}
 
     /* pass the entries of dir/file for return inode number */
-    int inum = get_inode(fd, inodes, entry_name); // get the inode number
+    int inum = get_inode(fd, inodes, entry_name, splits+1); // get the inode number
     //printf("inum: %d\n",inum); // print out the inode number after searched by get_inode()
 
     close(fd); // close the HD
@@ -121,7 +121,7 @@ int split_path(char *path, char **entry_name){
 }
 
 /* The goal of this open_t, function for return the inode num. */
-int get_inode(int fd, struct inode inodes, char **entry_name){
+int get_inode(int fd, struct inode inodes, char **entry_name, int splits){
     int inum = -1; // inode num for return
     int i=0;
     ssize_t ret=0;
@@ -138,23 +138,30 @@ int get_inode(int fd, struct inode inodes, char **entry_name){
     while(entry < ret){ // while entry less than read buffer(4K data blk)
         dir_entries = (DIR_NODE*)(buf+entry); // buf + offset(entry), cast as DIR NODE
 
-        if(!*dir_entries->dir){break;} // check if the entry is empty
+        if(!*dir_entries->dir){ // check if the entry is empty
+            if(splits != i){ // i != total splits means sub-dir not exsit
+                inum=-1;
+            }
+            break;
+        }
 
         //printf("%4s @inode#%d\n",dir_entries->dir,dir_entries->inode_number); // print all entries in dir, name + inode#
-        printf("entry_name[%d]: %s  <=> dir_entries: %s    inode#: %d\n",i,entry_name[i],dir_entries->dir,inum); // see if entry_name exist in dir_entries
+        //printf("entry_name[%d]: %s  <=> dir_entries: %s    inode#: %d\n",i,entry_name[i],dir_entries->dir,inum); // see if entry_name exist in dir_entries
         /* on9 inhuman logic created by me. originally for search dir recusively */
         if( strncmp(entry_name[i],dir_entries->dir,sizeof(dir_entries->dir)) == 0 ){ // if match name, update inode
             inum = dir_entries->inode_number; // update the inode num to that entry
-	    struct inode subdir_inode={};
-	    lseek(fd,INODE_OFFSET+inum*sizeof(struct inode),SEEK_SET); // go to the offset of the sub-directory inode
-	    read(fd,&subdir_inode,sizeof(struct inode)); // read the inode info. to subdir_inode
-	    lseek(fd, subdir_inode.direct_blk[0], SEEK_SET); //seek to the data blk
-	    read(fd, &buf, sizeof(buf)); // read the new directory file entries into buf
-	    entry = 0; // reset entry to 0 for search in new dir
+            struct inode subdir_inode={};
+            lseek(fd,INODE_OFFSET+inum*sizeof(struct inode),SEEK_SET); // go to the offset of the sub-directory inode
+            read(fd,&subdir_inode,sizeof(struct inode)); // read the inode info. to subdir_inode
+            lseek(fd, subdir_inode.direct_blk[0], SEEK_SET); //seek to the data blk
+            read(fd, &buf, sizeof(buf)); // read the new directory file entries into buf
+            entry = 0; // reset entry to 0 for search in new dir
             i = i + 1;
         }
 
         entry = entry + sizeof(DIR_NODE); // increase offset(entry)
+        //printf("split: %d   i: %d\n",splits,i);
+
     }
     return inum;
 }
