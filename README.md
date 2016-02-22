@@ -56,7 +56,7 @@ compile user commands:
     clang ../sfs_functions/{open_t.o,write_t.o} external_cp.c -o external_cp
     clang ../sfs_functions/{open_t.o,read_t.o} cat_t.c -o cat_t
 
-Now try to ls, "./ls_t /":
+Now try to ls, ```./ls_t /```:
 
     ./ls_t /
     inode#  type    size            name            create on
@@ -80,7 +80,7 @@ ls again:
     #0         0      48              ..            Thu Feb 18 01:00:06 2016
     #1         0      32        test_dir            Thu Feb 18 01:09:34 2016
 
-try external_cp:
+try ```external_cp```:
 
     ./external_cp hello.txt /
     ./ls_t
@@ -91,7 +91,7 @@ try external_cp:
     #1         0      32        test_dir            Fri Feb 19 10:12:17 2016
     #2         1      11       hello.txt            Fri Feb 19 10:13:36 2016
 
-try cat_t:
+try ```cat_t```:
 
     ./cat_t /hello.txt
     hello, sfs
