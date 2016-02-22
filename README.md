@@ -34,7 +34,7 @@
 - [x] tshell.c
 - [x] list the nest dir -> edit get_inode() func. in open_t.c
 - [ ] use 2nd & indirect blk
-- [ ] fix issues on external_cp.c => destination with its name
+- [ ] fix issues on external_cp.c => destination with its name, now just allow the dir name as the destination
 
 ####quick demo:
 
