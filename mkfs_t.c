@@ -27,8 +27,8 @@ static int create_superblk(int fd){
     printf("sizeof(sb): %lu\n",sizeof(sb)); // sizeof(sb) = 28bytes
 
     ssize_t ret;
-    lseek(fd, SB_OFFSET, SEEK_SET);
-    ret = write( fd, &sb, sizeof(sb) ); //write the superblock region 4096-512
+    lseek(fd, SB_OFFSET, SEEK_SET);	// go to the offset of superblk region
+    ret = write( fd, &sb, sizeof(sb) ); // write the superblock from its offset
     printf("SB write %zdBytes\n", ret);
     if( ret != sizeof(sb) ){
         printf("bytes written [%d] are not equal to the default block size\n", (int)ret);
@@ -40,11 +40,11 @@ static int create_superblk(int fd){
 
 /* create inode table */
 static int create_inode_table(int fd){
-	ssize_t ret=0;
+    ssize_t ret=0;
 
     int num_inodes = MAX_INODE; // set maximum 100 inodes
     printf("total inodes: %d\n",num_inodes);
-	struct inode inodes = {0};  // initialise a inode struct
+    struct inode inodes = {0};  // initialise a inode struct
 
     lseek(fd, INODE_OFFSET, SEEK_SET); // seek to first inode offset 4096
     for(int i=0; i<num_inodes; i++){ 
@@ -55,13 +55,13 @@ static int create_inode_table(int fd){
 
     printf("size of each inode %lu x 100 return: %zdbytes\n", sizeof(struct inode), ret);
 
-	if (ret != num_inodes*sizeof(struct inode)) {
-		perror("The inode store was not written properly. Retry your mkfs");
-		return -1;
-	}
+    if (ret != num_inodes*sizeof(struct inode)) {
+	perror("The inode store was not written properly. Retry your mkfs");
+	return -1;
+    }
 
-	printf("inode region written succesfully\n------\n");        
-	return ret;
+    printf("inode region written succesfully\n------\n");        
+    return ret;
 }
 
 /* create all the available 4K blocks */
