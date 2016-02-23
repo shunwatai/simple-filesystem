@@ -16,6 +16,11 @@ int main(int argc, char* argv[]){
         printf("src: existing file on real file system\ndes:absolute path of SFS\n");
         return -1;
     }
+    char *testpath = argv[2];
+    if(testpath[0]!='/'){
+        printf("please use absolute path\n");
+        return -1;
+    }
 
     ssize_t ret=0; // get the bytes of read/write
 
@@ -73,33 +78,30 @@ int main(int argc, char* argv[]){
     int dir_inode = open_t(dpath,2); // get inode number of that dir
     printf("inode of current dir: %d\n",dir_inode);
 
-/* *****if dir_inode=-1, the last entry is the filename, else user did not specific the name of copied file, then use the src argv[1] */
+    /* if dir_inode=-1, the last entry is the filename, else user did not specific the name of copied file, then use the src argv[1] */
     char path[1024] = "";  // if dpath containing the newfile name, trim it out and concat the splited path for get its inode# again.
     char filename[512] = ""; // maximum character of name 512
 
     char *entry_name[MAX_NESTING_DIR]; // separate the path by "/" and save, most dir nest 10.
     int count_split = split_path(dpath+1, entry_name) + 1; // split the path into pieces. this func. from open_t.c
 
-    if(count_split==1){ // that file copying to root dir
-        if(strncmp(dpath,"/.",strlen(dpath))!=0){ // if not just a "/", but with a specific name, then use it.
-            strncpy(filename,entry_name[0],strlen(entry_name[0]));
-        }
-    }
-
     if(dir_inode == -1){ // get the filename, also search for the dir inode again
         printf("the last part of path: %s\n",entry_name[count_split-1]);
         strncpy(filename, entry_name[count_split-1], strlen(entry_name[count_split-1])); // copy last entry as filename that will be created
-        strncpy(path,"/", sizeof(char)); // abs. path begin with "/"
-        for(int i=0; i<count_split; i++){
-            strncat(path, entry_name[i], sizeof(entry_name[i])); // start concat the entry_name
-            if(i+1 == count_split-1){ // if i+1 is the last of entry_name[](new dir), break
-                break;
+        strncpy(path,"/.", sizeof(path)); // path is root dir "/." if not meet the next line condition
+        if(count_split>1){ // if NOT copy to sub dir
+            strncpy(path,"/", sizeof(char)); // abs. path begin with "/"
+            for(int i=0; i<count_split; i++){
+                strncat(path, entry_name[i], sizeof(entry_name[i])); // start concat the entry_name
+                if(i+1 == count_split-1){ // if i+1 is the last of entry_name[](new dir), break
+                    break;
+                }
+                strncat(path,"/", sizeof(char));
             }
-            strncat(path,"/", sizeof(char));
         }
         dir_inode = open_t(path,2); // get inode number again of that dir
-    } else { // else the use did not specific the file name. just the path of dir
-        strncpy(filename, argv[1], sizeof(filename));
+    } else { // else the user did not specific the file name. just the path of dir,
+        strncpy(filename, argv[1], sizeof(filename)); // so use the src name
     }
 
     /* add the copied file into the directory entry */

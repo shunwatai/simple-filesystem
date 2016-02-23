@@ -63,7 +63,7 @@ int main(int argc, char *argv[]){
 
     inum = open_t(path, flags);  // use the open_t to get the inode#
     if(inum==-1){
-        perror("director/file not exist");
+        printf("director/file not exist....\n");
         return -1;
     }
 

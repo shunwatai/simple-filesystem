@@ -128,7 +128,7 @@ int get_inode(int fd, struct inode inodes, char **entry_name, int splits){
     //print_inode(inodes);
 
     // read directory entry
-    char buf[BLOCK_SIZE]; // buffer for read a 4K block
+    char buf[BLOCK_SIZE];  // buffer for read a 4K block(the dir file datablk)
     DIR_NODE *dir_entries; // ptr point to address of entry
     //if(inodes.i_size/4096<=1) // <=1 1blk, >1 use indirect blk
     lseek(fd, inodes.direct_blk[0], SEEK_SET); // go to that data block by offset, read the real data
@@ -139,7 +139,7 @@ int get_inode(int fd, struct inode inodes, char **entry_name, int splits){
         dir_entries = (DIR_NODE*)(buf+entry); // buf + offset(entry), cast as DIR NODE
 
         if(!*dir_entries->dir){ // check if the entry is empty
-            if(splits != i){ // i != total splits means sub-dir not exsit
+            if(splits != i){    // i != total splits means sub-dir not exsit
                 inum=-1;
             }
             break;
@@ -147,7 +147,7 @@ int get_inode(int fd, struct inode inodes, char **entry_name, int splits){
 
         //printf("%4s @inode#%d\n",dir_entries->dir,dir_entries->inode_number); // print all entries in dir, name + inode#
         //printf("entry_name[%d]: %s  <=> dir_entries: %s    inode#: %d\n",i,entry_name[i],dir_entries->dir,inum); // see if entry_name exist in dir_entries
-        /* on9 inhuman logic created by me. originally for search dir recusively */
+        /* on9 inhuman logic created by me. originally wanted to search dir recusively */
         if( strncmp(entry_name[i],dir_entries->dir,sizeof(dir_entries->dir)) == 0 ){ // if match name, update inode
             inum = dir_entries->inode_number; // update the inode num to that entry
             struct inode subdir_inode={};
@@ -160,8 +160,7 @@ int get_inode(int fd, struct inode inodes, char **entry_name, int splits){
         }
 
         entry = entry + sizeof(DIR_NODE); // increase offset(entry)
-        //printf("split: %d   i: %d\n",splits,i);
-
+        printf("splits: %d   i: %d\n",splits,i);
     }
     return inum;
 }
