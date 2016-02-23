@@ -17,7 +17,7 @@
 5. worked on ```mkdir_t.c```
 6. worked on ```external_cp.c``` & ```write_t.c```
 7. worked on ```cat_t.c``` & ```read_t.c```
-8. find a [sample code](http://www.codereview.stackexchange.com/questions/67746/simple-shell-in-c) for tshell, just modified it a bit to run the user commands in sfs_user_commands folder. Just compile and run the tshell, try to enter the *_t commands without "./" prefix
+8. find a [sample code](http://codereview.stackexchange.com/questions/67746/simple-shell-in-c) for tshell, just modified it a bit to run the user commands in sfs_user_commands folder. Just compile and run the tshell, try to enter the *_t commands without "./" prefix
 
 
 ####TODO:
@@ -33,8 +33,8 @@
 - [ ] cp_t.c
 - [x] tshell.c
 - [x] list the nest dir -> edit get_inode() func. in open_t.c
-- [ ] use 2nd & indirect blk
-- [ ] fix issues on external_cp.c => destination with its name, now just allow the dir name as the destination
+- [ ] use 2nd directblk & indirect blk
+- [x] fix issues on external_cp.c => destination with its name, now just allow the dir name as the destination
 
 ####quick demo:
 
@@ -54,7 +54,7 @@ compile system call functions:
 compile user commands:
 
     cd sfs_user_commands
-    clang ../sfs_functions/{open_t.o,write_t.o} ls_t.c -o ls_t
+    clang ../sfs_functions/open_t.o ls_t.c -o ls_t
     clang ../sfs_functions/{open_t.o,write_t.o} mkdir_t.c -o mkdir_t
     clang ../sfs_functions/{open_t.o,write_t.o} external_cp.c -o external_cp
     clang ../sfs_functions/{open_t.o,read_t.o} cat_t.c -o cat_t
