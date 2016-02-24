@@ -90,9 +90,9 @@ int main(int argc, char* argv[]){
         strncpy(filename, entry_name[count_split-1], strlen(entry_name[count_split-1])); // copy last entry as filename that will be created
         strncpy(path,"/.", sizeof(path)); // path is root dir "/." if not meet the next line condition
         if(count_split>1){ // if NOT copy to sub dir
-            strncpy(path,"/", sizeof(char)); // abs. path begin with "/"
+            strncpy(path,"/", sizeof(char)+1); // abs. path begin with "/"
             for(int i=0; i<count_split; i++){
-                strncat(path, entry_name[i], sizeof(entry_name[i])); // start concat the entry_name
+                strncat(path, entry_name[i], strlen(path)); // start concat the entry_name
                 if(i+1 == count_split-1){ // if i+1 is the last of entry_name[](new dir), break
                     break;
                 }
