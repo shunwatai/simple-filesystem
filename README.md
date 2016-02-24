@@ -18,7 +18,7 @@
 6. worked on ```external_cp.c``` & ```write_t.c```
 7. worked on ```cat_t.c``` & ```read_t.c```
 8. found a [sample code](http://codereview.stackexchange.com/questions/67746/simple-shell-in-c) for tshell, just modified it a bit to run the user commands in sfs_user_commands folder. Just compile and run the tshell, try to enter the *_t commands without "./" prefix
-
+9. worked on ```cp_t.c```, just copied most of the codes from ```external_cp.c``` except the handling the source(argv[1]), just use ```open_t``` to find its inode#
 
 ####TODO:
 - [x] mkfs_t.c
@@ -30,11 +30,12 @@
 - [x] read_t.c
 - [x] cat_t.c
 - [ ] cd_t.c
-- [ ] cp_t.c
+- [x] cp_t.c
 - [x] tshell.c
-- [x] list the nest dir -> edit get_inode() func. in open_t.c
+- [x] list the nest dir -> edit ```get_inode()``` func. in open_t.c
 - [ ] use 2nd directblk & indirect blk
-- [x] fix issues on external_cp.c => destination with its name, now just allow the dir name as the destination
+- [x] fix issues on ```external_cp.c``` => destination with its name, now just allow the dir name as the destination
+- [ ] handle the ```flags``` parameter in```open_t.c```
 
 ####quick demo:
 
@@ -57,6 +58,7 @@ compile user commands:
     clang ../sfs_functions/open_t.o ls_t.c -o ls_t
     clang ../sfs_functions/{open_t.o,write_t.o} mkdir_t.c -o mkdir_t
     clang ../sfs_functions/{open_t.o,write_t.o} external_cp.c -o external_cp
+    clang ../sfs_functions/{open_t.o,write_t.o} cp_t.c -o cp_t
     clang ../sfs_functions/{open_t.o,read_t.o} cat_t.c -o cat_t
 
 Now try to ls, ```./ls_t /```:
