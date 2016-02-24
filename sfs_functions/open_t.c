@@ -160,7 +160,7 @@ int get_inode(int fd, struct inode inodes, char **entry_name, int splits){
         }
 
         entry = entry + sizeof(DIR_NODE); // increase offset(entry)
-        printf("splits: %d   i: %d\n",splits,i);
+        //printf("splits: %d   i: %d\n",splits,i);
     }
     return inum;
 }
