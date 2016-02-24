@@ -32,4 +32,3 @@ typedef struct dir_mapping{ /* Record file information in directory file */
 #define BLOCK_SIZE          4096    /* The size per block */
 #define MAX_NESTING_DIR     10      /* The nesting number of directory */
 #define MAX_COMMAND_LENGTH  50      /* The maximum command length */
-//abc
