@@ -17,7 +17,7 @@
 5. worked on ```mkdir_t.c```
 6. worked on ```external_cp.c``` & ```write_t.c```
 7. worked on ```cat_t.c``` & ```read_t.c```
-8. find a [sample code](http://codereview.stackexchange.com/questions/67746/simple-shell-in-c) for tshell, just modified it a bit to run the user commands in sfs_user_commands folder. Just compile and run the tshell, try to enter the *_t commands without "./" prefix
+8. found a [sample code](http://codereview.stackexchange.com/questions/67746/simple-shell-in-c) for tshell, just modified it a bit to run the user commands in sfs_user_commands folder. Just compile and run the tshell, try to enter the *_t commands without "./" prefix
 
 
 ####TODO:
