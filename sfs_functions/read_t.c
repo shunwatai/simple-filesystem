@@ -15,7 +15,7 @@
 int read_t( int inode_number, int offset, void *buf, int count){ 
     //printf("inode#: %d\ndata_offset: %d\nsizeof(buf): %lu\ncount: %d\n",inode_number,offset,sizeof(buf),count);
     ssize_t ret = 0; // get the bytes of read
-        
+    
     /* open HD */
     int fd; // for open HD to read
     fd = open("../HD",O_RDONLY); // open ../HD for readonly
