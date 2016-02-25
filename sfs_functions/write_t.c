@@ -43,18 +43,69 @@ int write_t(int inode_number, int offset, void *buf, int count){
     inodes.i_type = 1;               /* Regular file for 1, directory file for 0 */
     inodes.i_size = count;           /* The size of file */    
     inodes.i_blocks = count/4096+1;  /* The total numbers of data blocks    */
-    inodes.direct_blk[0] = offset;   /* Two direct data block pointers    */
-    inodes.indirect_blk = -1;        /* One indirect data block pointer */
     inodes.file_num = 0;             /* The number of file in directory, it is 0 if it is file*/
+
+    /* if less than 4096, use 1 blk */
+    if(count<=BLOCK_SIZE){
+        inodes.direct_blk[0] = offset;   
+        /* write to the data blk */
+        lseek(fd, inodes.direct_blk[0], SEEK_SET); // go to the data blk region    
+        ret = write(fd, buf, count); // write buf to data blk
+        if(ret!=count){
+            perror("write failed");
+            return -1;
+        }
+    }else{
+        /* write 4096 sin */
+        lseek(fd, inodes.direct_blk[0], SEEK_SET); // go to the data blk region    
+        ret = write(fd, buf, BLOCK_SIZE); // write buf to data blk
+        if(ret!=BLOCK_SIZE){
+            perror("write failed");
+            return -1;
+        }
+    }
+    
+    /* if count greater than 4096 2nd direct */
+    if(count>BLOCK_SIZE){
+        inodes.direct_blk[1] = offset+BLOCK_SIZE;
+        lseek(fd, inodes.direct_blk[1], SEEK_SET);   // go to the data blk region  
+        ret = write(fd, buf+BLOCK_SIZE, BLOCK_SIZE); // write buf to data blk
+        if(ret!=BLOCK_SIZE){
+            perror("write failed");
+            return -1;
+        }
+    }else{
+        inodes.direct_blk[1] = -1; // this inode do not need to use 2nd direct blk
+    }
+    
+    /* handle size greater than 8192, use indirect blk */
+    if(count>BLOCK_SIZE*2){
+        inodes.indirect_blk = offset+BLOCK_SIZE+BLOCK_SIZE; // indirectblk start at this offset
+        
+        int remain_size = count - 8192; // get the size that remaining for write to indrtblks
+        int total_indirectblk = inodes.i_blocks - 2; // get the num of total blk pointers for store in indirectblks
+        
+        for(int i=0; i<total_indirectblk; i++){      // loop the need of total blk pointers
+            int indrtblk_offset = inodes.indirect_blk + BLOCK_SIZE*(i+1); // set the blk pointer offset
+            lseek(fd, inodes.indirect_blk + sizeof(int) * i, SEEK_SET);   // go into indirectblk region
+            write(fd, &indrtblk_offset, sizeof(int)); // write that pointer offset into indirectblk
+            
+            /* write the data to pointer offset region */            
+            lseek(fd, indrtblk_offset, SEEK_SET);  // goto offset of indirct blk pointer
+            if(remain_size<BLOCK_SIZE){   // if the remaining size less than 4k blk, 
+                write(fd, &buf+(BLOCK_SIZE*2 + i*BLOCK_SIZE), remain_size); // just write it
+                break;
+            }
+            write(fd, &buf+(BLOCK_SIZE*2 + i*BLOCK_SIZE), BLOCK_SIZE); // write the file content to blk
+            remain_size = remain_size - BLOCK_SIZE; // decrease the remaining size to write
+        }
+        
+    }else{
+        inodes.indirect_blk = -1;    // this inode do not need to use indirect blk
+    }
     //print_inode(inodes);  // see the inode result
     
-    /* write to the data blk */
-    lseek(fd, inodes.direct_blk[0], SEEK_SET); // go to the data blk region    
-    ret = write(fd, buf, count); // write buf to data blk
-    if(ret!=count){
-        perror("write failed");
-        return -1;
-    }
+    
     
     /* testing: read the data blk and display the message */
     //char test[count];
@@ -84,7 +135,11 @@ int write_t(int inode_number, int offset, void *buf, int count){
     }
     
     sb.next_available_inode = sb.next_available_inode + sizeof(struct inode);
-    sb.next_available_blk = sb.next_available_blk + BLOCK_SIZE;
+    if(inodes.i_blocks<3){ // no indirect blk
+        sb.next_available_blk = sb.next_available_blk + BLOCK_SIZE*inodes.i_blocks; // inodes.i_blocks either 1 or 2
+    }else{
+        sb.next_available_blk = sb.next_available_blk + BLOCK_SIZE*inodes.i_blocks+1; // indirectblk
+    }
     //print_sb(sb);
     
     lseek(fd, SB_OFFSET, SEEK_SET);
