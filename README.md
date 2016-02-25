@@ -2,12 +2,13 @@
 
 ##This homework not finish yet, and I may not finish it. Also, many bugs + unreadable codes, please read the entire README.
 
-###important notice:
-1. for the open_t.c, it is very mess. Also, I DID NOT(forgot) use the parameter "flags", actually I think if flags=0 run create file func.; if flags=1 run make directory func.; if flags=2 run read file func. However, I just put those func directly in externt_cp, mkdir_t, cat_t....
-2. must use absolute path on the SFS
+###important notice!!!:
+1. must use "ABSOLUTE PATH" in the SFS. Why?? Actually, this SFS not mount on any "/" directory. The prefix of "/" in SFS is fake!!! when user input the abs. path, the first char "/" will be ignored, thats why the parameter "path" in ```split_path()``` func. always +1.
+2. for the open_t.c, it is very mess. Also, I DID NOT(forgot) use the parameter "flags", actually I think if flags=0 run create file func.; if flags=1 run make directory func.; if flags=2 run read file func. However, I just put those func directly in externt_cp, mkdir_t, cat_t....
 3. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
 4. only used one direct data block, 2nd direct blk and the indirect blk are not implemented yet, so DO NOT copy file that greater than 4096bytes
 5. the split_path() func. in open_t.c is buggy. I dont know there is a strsep() in C when I doing this homework. I may use strsep() to replace my self-implement split func. if I have time.
+
 
 ####my steps to do this shit:
 1. made the ```mkfs_t.c```, form the layout of HD
@@ -45,7 +46,7 @@ You can just use ```gcc``` instead of ```clang``` as the compiler
 
     ./buildHD.sh
 
-compile system call functions:
+compile system call functions [details](https://stackoverflow.com/questions/2831361/how-can-i-create-c-header-files):
 
     cd sfs_functions
     clang -c open_t.c -o open_t.o
