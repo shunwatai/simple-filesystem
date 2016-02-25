@@ -57,7 +57,7 @@ int read_t( int inode_number, int offset, void *buf, int count){
     }
     else{ // read 4k blk sin in 1st directblk
         ret = read(fd, &tmpbuf, BLOCK_SIZE); // read out the 4096 bytes of content to tmpbuf
-        strncpy(buf, &tmpbuf, BLOCK_SIZE);   // copy tmpbuf to buf
+        strncpy(buf, tmpbuf, BLOCK_SIZE);   // copy tmpbuf to buf
         remainsize = remainsize - BLOCK_SIZE; // count the remaining size to read
     }
     
@@ -65,12 +65,12 @@ int read_t( int inode_number, int offset, void *buf, int count){
     if(count>BLOCK_SIZE && remainsize<BLOCK_SIZE){
         lseek(fd, inodes.direct_blk[1], SEEK_SET); // goto 2nd direct blk
         ret += read(fd, &tmpbuf, remainsize); // read 4096 to tmpbuf
-        strncat(buf, &tmpbuf, remainsize);
+        strncat(buf, tmpbuf, remainsize);
     }
     if(remainsize>BLOCK_SIZE){ // remaining size still greater than 4096
         lseek(fd, inodes.direct_blk[1], SEEK_SET); // goto 2nd direct blk
         ret += read(fd, &tmpbuf, BLOCK_SIZE); // read 4096 to tmpbuf
-        strncat(buf, &tmpbuf, BLOCK_SIZE);
+        strncat(buf, tmpbuf, BLOCK_SIZE);
         remainsize = remainsize - BLOCK_SIZE; // count the remaining size to read
     }
     
@@ -83,11 +83,11 @@ int read_t( int inode_number, int offset, void *buf, int count){
             lseek(fd, ptr_offset, SEEK_SET); // go to offset of that datablk
             if(remainsize<BLOCK_SIZE){ // if less than 4k,
                 ret += read(fd, &tmpbuf, remainsize); // just read the remaining
-                strncat(buf, &tmpbuf, remainsize); // concat it to buf and break
+                strncat(buf, tmpbuf, remainsize); // concat it to buf and break
                 break;
             }
             ret += read(fd, &tmpbuf, BLOCK_SIZE); 
-            strncat(buf, &tmpbuf, BLOCK_SIZE);
+            strncat(buf, tmpbuf, BLOCK_SIZE);
         }
     }
     
