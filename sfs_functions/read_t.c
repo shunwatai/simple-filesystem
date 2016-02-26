@@ -13,7 +13,7 @@
 /* inode_number & offset for the location of the file. buf is the space for content and count is bytes size.
  * This function for user command cat_t */
 int read_t( int inode_number, int offset, void *buf, int count){ 
-    //printf("inode#: %d\ndata_offset: %d\nsizeof(buf): %lu\ncount: %d\n",inode_number,offset,sizeof(buf),count);
+    printf("inode#: %d\ndata_offset: %d\ncount: %d\n",inode_number,offset,count);
     ssize_t ret = 0; // get the bytes of read
     
     /* open HD */
@@ -47,7 +47,8 @@ int read_t( int inode_number, int offset, void *buf, int count){
     
     /* seek to data blk according to offset parameter */
     lseek(fd, offset, SEEK_SET); // seek to data blk which storing real data
-    char tmpbuf[sizeof(buf)]; // store the read string temporary
+    char tmpbuf[count]; // store the read string temporary
+    printf("sizeof(tmpbuf): %lu\n",sizeof(tmpbuf));
     
     int remainsize = count; // for count the remain size of file
     /* read 1st directblk */
@@ -57,20 +58,26 @@ int read_t( int inode_number, int offset, void *buf, int count){
     }
     else{ // read 4k blk sin in 1st directblk
         ret = read(fd, &tmpbuf, BLOCK_SIZE); // read out the 4096 bytes of content to tmpbuf
-        strncpy(buf, tmpbuf, BLOCK_SIZE);   // copy tmpbuf to buf
+        memcpy(buf, tmpbuf, BLOCK_SIZE);   // copy tmpbuf to buf        
         remainsize = remainsize - BLOCK_SIZE; // count the remaining size to read
+        printf("1st firect blk read:\n");
+        //printf("%s\n",buf);
     }
     
     /* read 2nd directblk */
     if(count>BLOCK_SIZE && remainsize<BLOCK_SIZE){
+        printf("reading remaining buf: %d...\n", remainsize);
         lseek(fd, inodes.direct_blk[1], SEEK_SET); // goto 2nd direct blk
-        ret += read(fd, &tmpbuf, remainsize); // read 4096 to tmpbuf
-        strncat(buf, tmpbuf, remainsize);
+        ret += read(fd, &tmpbuf, remainsize); // read remainsize to tmpbuf
+        tmpbuf[remainsize] = '\0'; // add a null char to terminate the string at the end
+        //printf("%s\n",tmpbuf);
+        memcpy(buf+BLOCK_SIZE, tmpbuf, remainsize); // concatinate buf with tmpbuf
     }
     if(remainsize>BLOCK_SIZE){ // remaining size still greater than 4096
-        lseek(fd, inodes.direct_blk[1], SEEK_SET); // goto 2nd direct blk
+        printf("reading 4k buf in 2nd direct...\n");
+        lseek(fd, inodes.direct_blk[1], SEEK_SET); // goto 2nd direct blk        
         ret += read(fd, &tmpbuf, BLOCK_SIZE); // read 4096 to tmpbuf
-        strncat(buf, tmpbuf, BLOCK_SIZE);
+        memcpy(buf+BLOCK_SIZE, tmpbuf, BLOCK_SIZE);
         remainsize = remainsize - BLOCK_SIZE; // count the remaining size to read
     }
     
@@ -78,16 +85,17 @@ int read_t( int inode_number, int offset, void *buf, int count){
     if(num_blocks>2){ // this inode used more than 2 blk
         int ptr_offset=0;
         for(int i=0; i<num_blocks-2; i++){
-            lseek(fd, inodes.indirect_blk, SEEK_SET); // goto indirectblk
-            read(fd, &ptr_offset, sizeof(int)+i*sizeof(int)); // read the offset of indirectblk ptr
+            lseek(fd, inodes.indirect_blk+i*sizeof(int), SEEK_SET); // goto indirectblk
+            read(fd, &ptr_offset, sizeof(int)); // read the offset of indirectblk ptr
             lseek(fd, ptr_offset, SEEK_SET); // go to offset of that datablk
             if(remainsize<BLOCK_SIZE){ // if less than 4k,
                 ret += read(fd, &tmpbuf, remainsize); // just read the remaining
-                strncat(buf, tmpbuf, remainsize); // concat it to buf and break
+                tmpbuf[remainsize] = '\0'; // add a null char to terminate the string at the end
+                memcpy(buf+(BLOCK_SIZE*2+BLOCK_SIZE*i), tmpbuf, remainsize); // concat it to buf and break. BLOCK_SIZE*2 is offset of 2 directblk, BLOCK_SIZE*i is directblk offset
                 break;
             }
             ret += read(fd, &tmpbuf, BLOCK_SIZE); 
-            strncat(buf, tmpbuf, BLOCK_SIZE);
+            memcpy(buf+(BLOCK_SIZE*2+BLOCK_SIZE*i), tmpbuf, BLOCK_SIZE); // concat. BLOCK_SIZE*2 is offset of 2 directblk, BLOCK_SIZE*i is directblk offset
         }
     }
     

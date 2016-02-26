@@ -42,10 +42,10 @@ int main(int argc, char* argv[]){
     ret = read(src, buf, size); // read the file to buf
 
     /* just print out the text from file */
-    printf("buf: ");
-    for(int i=0; i<ret; i++){
-        printf("%c ",buf[i]);
-    }
+    //printf("buf: ");
+    //for(int i=0; i<ret; i++){
+        //printf("%c ",buf[i]);
+    //}
 
     /* now read out the superblock for available inode and datablk to write */
     struct superblock sb={};

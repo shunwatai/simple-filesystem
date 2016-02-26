@@ -44,7 +44,9 @@ int write_t(int inode_number, int offset, void *buf, int count){
     inodes.i_size = count;           /* The size of file */    
     inodes.i_blocks = count/4096+1;  /* The total numbers of data blocks    */
     inodes.file_num = 0;             /* The number of file in directory, it is 0 if it is file*/
-
+    
+    
+    int remain_size = count; // get the size that remaining for write to blks
     /* if less than 4096, use 1 blk */
     if(count<=BLOCK_SIZE){
         inodes.direct_blk[0] = offset;   
@@ -55,34 +57,47 @@ int write_t(int inode_number, int offset, void *buf, int count){
             perror("write failed");
             return -1;
         }
-    }else{
+    }else{    
         /* write 4096 sin */
+        inodes.direct_blk[0] = offset; // i am a on9
         lseek(fd, inodes.direct_blk[0], SEEK_SET); // go to the data blk region    
         ret = write(fd, buf, BLOCK_SIZE); // write buf to data blk
+        remain_size = remain_size - BLOCK_SIZE;
         if(ret!=BLOCK_SIZE){
+            perror("write failed");
+            return -1;
+        }        
+    }
+
+    /* if count greater than 4096 2nd direct */
+    if(count>BLOCK_SIZE && remain_size<BLOCK_SIZE){
+        printf("writing on 2nd directblk...\n");
+        //printf("buf start at 4096: \n%s", buf+BLOCK_SIZE);
+        inodes.direct_blk[1] = offset+BLOCK_SIZE; // 2nd blk is the 4096bytes next to 1st blk
+        lseek(fd, inodes.direct_blk[1], SEEK_SET);   // go to the data blk region  
+        ret = write(fd, buf+BLOCK_SIZE, remain_size); // write buf to data blk
+        if(ret!=remain_size){
             perror("write failed");
             return -1;
         }
     }
-    
-    /* if count greater than 4096 2nd direct */
-    if(count>BLOCK_SIZE){
-        inodes.direct_blk[1] = offset+BLOCK_SIZE;
+    if(remain_size>BLOCK_SIZE){
+        printf("dllm\n");
+        inodes.direct_blk[1] = offset+BLOCK_SIZE; // 2nd blk is the 4096bytes next to 1st blk
         lseek(fd, inodes.direct_blk[1], SEEK_SET);   // go to the data blk region  
         ret = write(fd, buf+BLOCK_SIZE, BLOCK_SIZE); // write buf to data blk
         if(ret!=BLOCK_SIZE){
             perror("write failed");
             return -1;
         }
-    }else{
-        inodes.direct_blk[1] = -1; // this inode do not need to use 2nd direct blk
     }
+
     
     /* handle size greater than 8192, use indirect blk */
     if(count>BLOCK_SIZE*2){
         inodes.indirect_blk = offset+BLOCK_SIZE+BLOCK_SIZE; // indirectblk start at this offset
         
-        int remain_size = count - 8192; // get the size that remaining for write to indrtblks
+        //int remain_size = count - 8192; // get the size that remaining for write to indrtblks
         int total_indirectblk = inodes.i_blocks - 2; // get the num of total blk pointers for store in indirectblks
         
         for(int i=0; i<total_indirectblk; i++){      // loop the need of total blk pointers
@@ -129,10 +144,11 @@ int write_t(int inode_number, int offset, void *buf, int count){
     struct superblock sb={};
     lseek(fd, SB_OFFSET, SEEK_SET);
     ret = read(fd, &sb, sizeof(struct superblock));
-        if(ret!=sizeof(struct superblock)){
+    if(ret!=sizeof(struct superblock)){
         perror("failed to read superblk");
         return -1;
     }
+    print_sb(sb);
     
     sb.next_available_inode = sb.next_available_inode + sizeof(struct inode);
     if(inodes.i_blocks<3){ // no indirect blk

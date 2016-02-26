@@ -39,18 +39,20 @@ int main(int argc, char *argv[]){
     
     int data_offset = inodes.direct_blk[0]; // get the datablk offset of real data
     int file_size = inodes.i_size; // file size in bytes 
-    char buf[file_size]; // buffer for store the content    
+    //printf("inodes.i_size: %d\n", inodes.i_size);
+    //char buf[file_size]; // buffer for store the content    
+    char *buf = malloc(file_size+1); // buffer for store the content   
 
-    ret = read_t( inode_num, data_offset, &buf, file_size);
+    ret = read_t( inode_num, data_offset, buf, file_size);
     if(ret!=file_size){
         perror("failed to read the file...");
         return -1;
     }
     
     /* the goal of cat_t. after read_t, print out the file content */
-    for(int i=0; i<file_size; i++){ // print char by char
-        printf("%c",buf[i]);
-    }
+    //for(int i=0; i<file_size; i++){ // print char by char
+        //printf("%c",buf[i]);
+    //}
     
     close(fd);
     return 0;
