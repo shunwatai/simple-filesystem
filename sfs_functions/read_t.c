@@ -13,7 +13,7 @@
 /* inode_number & offset for the location of the file. buf is the space for content and count is bytes size.
  * This function for user command cat_t */
 int read_t( int inode_number, int offset, void *buf, int count){ 
-    printf("inode#: %d\ndata_offset: %d\ncount: %d\n",inode_number,offset,count);
+    //printf("inode#: %d\ndata_offset: %d\ncount: %d\n",inode_number,offset,count);
     ssize_t ret = 0; // get the bytes of read
     
     /* open HD */
@@ -77,7 +77,7 @@ int read_t( int inode_number, int offset, void *buf, int count){
         printf("reading 4k buf in 2nd direct...\n");
         lseek(fd, inodes.direct_blk[1], SEEK_SET); // goto 2nd direct blk        
         ret += read(fd, &tmpbuf, BLOCK_SIZE); // read 4096 to tmpbuf
-        memcpy(buf+BLOCK_SIZE, tmpbuf, BLOCK_SIZE);
+        memcpy(buf+BLOCK_SIZE, tmpbuf, BLOCK_SIZE+1);
         remainsize = remainsize - BLOCK_SIZE; // count the remaining size to read
     }
     

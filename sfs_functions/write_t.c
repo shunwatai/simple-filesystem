@@ -14,8 +14,8 @@
 int write_t(int inode_number, int offset, void *buf, int count){      
     //printf("inode#%d\noffset: %d\nbuf: %scount: %d\n",inode_number,offset,buf,count);
     //printf("=====================\n");
-    ssize_t ret=0; // get bytes of read/write
-    
+    ssize_t ret=0; // get bytes of read/write    
+        
     /* open HD */
     int fd; // for HD
     fd = open("../HD", O_RDWR); // open the HD to fd
@@ -86,6 +86,7 @@ int write_t(int inode_number, int offset, void *buf, int count){
         inodes.direct_blk[1] = offset+BLOCK_SIZE; // 2nd blk is the 4096bytes next to 1st blk
         lseek(fd, inodes.direct_blk[1], SEEK_SET);   // go to the data blk region  
         ret = write(fd, buf+BLOCK_SIZE, BLOCK_SIZE); // write buf to data blk
+        remain_size = remain_size - BLOCK_SIZE;
         if(ret!=BLOCK_SIZE){
             perror("write failed");
             return -1;
@@ -101,14 +102,15 @@ int write_t(int inode_number, int offset, void *buf, int count){
         int total_indirectblk = inodes.i_blocks - 2; // get the num of total blk pointers for store in indirectblks
         
         for(int i=0; i<total_indirectblk; i++){      // loop the need of total blk pointers
-            int indrtblk_offset = inodes.indirect_blk + BLOCK_SIZE*(i+1); // set the blk pointer offset
+            int indrtblk_offset = inodes.indirect_blk + BLOCK_SIZE*(i+1); // set the data blk pointer offset for store the real data
             lseek(fd, inodes.indirect_blk + sizeof(int) * i, SEEK_SET);   // go into indirectblk region
             write(fd, &indrtblk_offset, sizeof(int)); // write that pointer offset into indirectblk
             
             /* write the data to pointer offset region */            
             lseek(fd, indrtblk_offset, SEEK_SET);  // goto offset of indirct blk pointer
-            if(remain_size<BLOCK_SIZE){   // if the remaining size less than 4k blk, 
-                write(fd, &buf+(BLOCK_SIZE*2 + i*BLOCK_SIZE), remain_size); // just write it
+            printf("remain: %d\n",remain_size);
+            if(remain_size<BLOCK_SIZE){   // if the remaining size less than 4k blk,                
+                write(fd, buf+((BLOCK_SIZE*2 + i*BLOCK_SIZE)-1), remain_size); // just write it                
                 break;
             }
             write(fd, &buf+(BLOCK_SIZE*2 + i*BLOCK_SIZE), BLOCK_SIZE); // write the file content to blk
