@@ -1,13 +1,13 @@
 ##please read the Assign1.pdf for details 
 
-##This homework not finish yet, and I may not finish it. Also, many bugs + unreadable codes, please read the entire README.
+##This homework not finish yet, and I may not finish it on time. Also, many bugs + unreadable codes, please read the entire README.
 
 ###important notice!!!:
 1. must use "ABSOLUTE PATH" in the SFS. Why?? Actually, this SFS not mount on any "/" directory. The prefix of "/" in SFS is fake!!! when user input the abs. path, the first char "/" will be ignored, thats why the parameter "path" in ```split_path()``` func. always +1.
 2. for the open_t.c, it is very mess. Also, I DID NOT(forgot) use the parameter "flags", actually I think if flags=0 run create file func.; if flags=1 run make directory func.; if flags=2 run read file func. However, I just put those func directly in externt_cp, mkdir_t, cat_t....
 3. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
 4. only used one direct data block, 2nd direct blk and the indirect blk are not implemented yet, so DO NOT copy file that greater than 4096bytes
-5. the split_path() func. in open_t.c is buggy. I dont know there is a strsep() in C when I doing this homework. I may use strsep() to replace my self-implement split func. if I have time.
+5. the ```split_path()``` func. in ```open_t.c``` is buggy. I dont know there is a ```strsep()``` in C when I doing this homework. I may use strsep() to replace my self-implement split func. if I have time.
 
 
 ####my steps to do this shit:
@@ -34,7 +34,8 @@
 - [x] cp_t.c
 - [x] tshell.c
 - [x] list the nest dir -> edit ```get_inode()``` func. in open_t.c
-- [ ] use 2nd directblk & indirect blk
+- [x] use 2nd directblk 
+- [ ] use indirect blk
 - [x] fix issues on ```external_cp.c``` => destination with its name, now just allow the dir name as the destination
 - [ ] handle the ```flags``` parameter in```open_t.c```
 
