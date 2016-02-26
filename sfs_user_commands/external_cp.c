@@ -92,17 +92,19 @@ int main(int argc, char* argv[]){
         if(count_split>1){ // if NOT copy to sub dir
             strncpy(path,"/", sizeof(char)+1); // abs. path begin with "/"
             for(int i=0; i<count_split; i++){
-                strncat(path, entry_name[i], strlen(path)); // start concat the entry_name
+                strncat(path, entry_name[i], strlen(entry_name[i])); // start concat the entry_name
                 if(i+1 == count_split-1){ // if i+1 is the last of entry_name[](new dir), break
                     break;
                 }
                 strncat(path,"/", sizeof(char));
             }
         }
+        printf("pp:%s\n",path);
         dir_inode = open_t(path,2); // get inode number again of that dir
     } else { // else the user did not specific the file name. just the path of dir,
         strncpy(filename, argv[1], sizeof(filename)); // so use the src name
     }
+    printf("pinode: %d\n",dir_inode);
 
     /* add the copied file into the directory entry */
     struct inode inodes={};
