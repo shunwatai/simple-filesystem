@@ -1,0 +1,129 @@
+create table person(id int, name varchar(255));
+create table location(placename varchar(255), attrname varchar(255), attrtype varchar(255), country varchar(255));
+create table visited(id int, placename varchar(255), year year);
+
+insert into person values(001, 'sam');
+insert into person values(002, 'john');
+insert into person values(003, 'may');
+insert into person values(004, 'tom');
+insert into person values(005, 'willson');
+insert into person values(006, 'chris');
+insert into person values(007, 'gary');
+
+insert into location values('aa', 'dis1', 'themepark', 'USA');
+insert into location values('aa', 'ab1', 'waterfall', 'USA');
+insert into location values('aa', 'ab2', 'waterfall', 'USA');
+insert into location values('ee', 'oc1', 'themepark', 'USA');
+insert into location values('dd', 'oc2', 'themepark', 'USA');
+insert into location values('cc', 'dis2', 'themepark', 'JAP');
+insert into location values('ff', 'm1', 'museum', 'CHINA');
+insert into location values('gg', 'b1', 'beach', 'CHINA');
+insert into location values('hh', 't1', 'tower', 'CHINA');
+insert into location values('ii', 'ab3', 'waterfall', 'CHINA');
+
+insert into visited values(001, 'aa', 2013);
+insert into visited values(001, 'bb', 2012);
+insert into visited values(001, 'ee', 2011);
+insert into visited values(006, 'ff', 2013);
+insert into visited values(006, 'gg', 2013);
+insert into visited values(006, 'hh', 2013);
+insert into visited values(006, 'ii', 2013);
+insert into visited values(007, 'ff', 2012);
+insert into visited values(007, 'gg', 2013);
+
+
+
+select person.name from person
+where person.name IN
+    (select person.name 
+    from person,visited,location
+    where person.id=visited.id and visited.placename=location.placename
+    and location.country='CHINA'
+    and visited.year='2012')
+AND person.name IN
+    (select person.name 
+    from person,visited,location
+    where person.id=visited.id and visited.placename=location.placename
+    and location.country='CHINA'
+    and visited.year='2013');
+
+## oracle db
+select person.name 
+from person,visited,location
+where person.id=visited.id and visited.placename=location.placename
+and location.country='CHINA'
+and EXTRACT(YEAR FROM visited.year)='2012'
+intersect
+select person.name 
+from person,visited,location
+where person.id=visited.id and visited.placename=location.placename
+and location.country='CHINA'
+and EXTRACT(YEAR FROM visited.year)='2013'
+
+select location.placename from location 
+where attrtype='waterfall'
+group by placename
+having count(*)>1;
+
+select vtotal.id from
+  (select visited.id,count(location.placename)as total from visited,location 
+  where location.placename=visited.placename and
+  location.country='CHINA'
+  group by visited.id)as vtotal,
+  
+  (select count(location.placename)as total from location
+  where country='CHINA') as total
+where vtotal.total=total.total
+
+
+=========================================================
+
+CREATE TABLE bperson(pid int, name varchar(255), phone int);
+CREATE TABLE book(bid int, aid int, cratedate date, price float);
+CREATE TABLE review(bid int, aid int, reid int, redate date, result char);
+
+INSERT INTO bperson value(001, 'sam', 23456789);
+INSERT INTO bperson value(002, 'john', 23453789);
+INSERT INTO bperson value(003, 'mary', 23120389);
+INSERT INTO bperson value(004, 'tom', 29878789);
+INSERT INTO bperson value(005, 'chris', 25687689);
+
+INSERT INTO book value(11, 001, '2015-5-5', 5.5);
+INSERT INTO book value(12, 002, '2015-2-5', 5.5);
+INSERT INTO book value(13, 003, '2015-3-5', 5.5);
+INSERT INTO book value(14, 004, '2015-5-7', 5.5);
+INSERT INTO book value(15, 005, '2015-5-9', 5.5);
+INSERT INTO book value(16, 002, '2015-5-9', 5.5);
+
+INSERT INTO review value(15, 005, 001, '2015-5-6', 'S');
+INSERT INTO review value(14, 004, 002, '2015-5-6', 'S');
+INSERT INTO review value(13, 003, 003, '2015-5-6', 'S');
+INSERT INTO review value(12, 002, 004, '2015-5-6', 'S');
+INSERT INTO review value(11, 001, 005, '2015-5-6', 'S');
+INSERT INTO review value(16, 002, 001, '2015-5-6', 'S');
+
+
+select bperson.name from bperson,(
+  select review.bid,review.reid,bperson.name from book,bperson,review
+  where bperson.pid=book.aid and
+  book.bid=review.bid) as tmp
+where bperson.pid=tmp.reid and
+tmp.name ='john'
+
+SELECT review.reid FROM review,book,bperson
+WHERE review.bid=book.bid AND
+bperson.pid=book.aid AND
+bperson.name='john';
+
+
+
+SELECT bperson.name,AVG(tmp.price) FROM bperson,(  
+  SELECT review.reid,bperson.name,book.price FROM book,review,bperson
+  WHERE book.bid=review.bid AND
+  bperson.pid=book.aid AND
+  review.result='S' AND
+  bperson.name='john') as tmp
+WHERE bperson.pid=tmp.reid AND
+bperson.name='mary';
+
+
