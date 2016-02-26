@@ -18,8 +18,10 @@
 5. worked on ```mkdir_t.c```
 6. worked on ```external_cp.c``` & ```write_t.c```
 7. worked on ```cat_t.c``` & ```read_t.c```
-8. found a [sample code](http://codereview.stackexchange.com/questions/67746/simple-shell-in-c) for tshell, just modified it a bit to run the user commands in sfs_user_commands folder. Just compile and run the tshell, try to enter the *_t commands without "./" prefix
-9. worked on ```cp_t.c```, just copied most of the codes from ```external_cp.c``` except the handling the source(argv[1]), just use ```open_t``` to find its inode#
+8. worked on ```cp_t.c```, just copied most of the codes from ```external_cp.c``` except the handling the source(argv[1]), just use ```open_t``` to find its inode#
+9. implemented 2nd direct block & indirect block
+9. made the tshell
+10. hardcode the cd_t in tshell
 
 ####TODO:
 - [x] mkfs_t.c
@@ -30,7 +32,7 @@
 - [x] write_t.c
 - [x] read_t.c
 - [x] cat_t.c
-- [ ] cd_t.c
+- [x] cd_t.c (hard code in tshell)
 - [x] cp_t.c
 - [x] tshell.c
 - [x] list the nest dir -> edit ```get_inode()``` func. in open_t.c
@@ -53,6 +55,7 @@ compile system call functions [details](https://stackoverflow.com/questions/2831
     clang -c open_t.c -o open_t.o
     clang -c write_t.c -o write_t.o
     clang -c read_t.c -o read_t.o
+    cd ..
 
 compile user commands:
 
