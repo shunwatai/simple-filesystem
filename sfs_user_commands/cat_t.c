@@ -50,9 +50,9 @@ int main(int argc, char *argv[]){
     }
     
     /* the goal of cat_t. after read_t, print out the file content */
-    //for(int i=0; i<file_size; i++){ // print char by char
-        //printf("%c",buf[i]);
-    //}
+    for(int i=0; i<file_size; i++){ // print char by char
+        printf("%c",buf[i]);
+    }
     
     close(fd);
     return 0;
