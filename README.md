@@ -44,7 +44,7 @@
 
 ###====================================================
 
-####quick demo:
+###quick demo:
 ####compile all the C programs
 You can just use ```gcc``` instead of ```clang``` as the compiler
 
