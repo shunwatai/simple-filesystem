@@ -117,7 +117,7 @@ Try ```external_cp``` a small file<8192 which use 2nd direct block:
     
 Try ```external_cp``` a small file>8192 which use indirect block:
     
-    tshell### [/]$ external_cp chapter_01.html /
+    tshell### [/]$ external_cp ch01.htm /
     the external file will use inode#4
     inode of current dir: 0
 
@@ -131,7 +131,7 @@ Try ```ls_t``` to see the copied files:
     #1         0      32        test_dir            Sat Feb 27 11:41:32 2016
     #2         1      14       hello.txt            Sat Feb 27 11:44:07 2016
     #3         1    4625      dbtest.txt            Sat Feb 27 11:50:06 2016
-    #4         1    9875      chapter_01            Sat Feb 27 11:51:11 2016
+    #4         1    9875        ch01.htm            Sat Feb 27 11:51:11 2016
     
 ####Now use cat_t to view the content:
 
@@ -146,7 +146,7 @@ Try ```ls_t``` to see the copied files:
     insert into person values(001, 'sam');
     ...   
     
-    tshell### [/]$ cat_t chapter_01.html 
+    tshell### [/]$ cat_t ch01.htm
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
     <html xmlns="http://www.w3.org/1999/xhtml">
 
