@@ -11,14 +11,14 @@
 6. the ```split_path()``` func. in ```open_t.c``` is buggy. I dont know there is a ```strsep()``` in C when I doing this homework. I may use strsep() to replace my self-implement split func. if I have time.
 7. File name in SFS maximum support 10characters because in ```struct dir_mapping```, its var is ```dir[10]```
 
-####My calculation of the maximum file that can store in this SFS:
+####My calculation of the maximum size of a single file that can store in this SFS:
     
     each inode has 2 direct blocks & 1 indirect block.
 
     2 direct blocks -> 4096 x 2 = 8192bytes
     
     1 indirect block -> this block only need to store the "offset"(a number) of another data block, 
-    and each "offset" is just a int, the ```sizeof(int)``` is 4 bytes. So this indirect block can store 4096/4=1024 offset of data blocks. 
+    and each "offset" is just a int, the "sizeof(int)" is 4 bytes. So this indirect block can store 4096/4=1024 offset of data blocks. 
     Since each data block is 4096bytes, this indirect block can store 1024(num of offset) x 4096(size of each datablk) = 4194304bytes
     
     The maximum size of a file is 8192bytes + 4194304bytes = 4202496bytes, which maybe around 4Mb.
