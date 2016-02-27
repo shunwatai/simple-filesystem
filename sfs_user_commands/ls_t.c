@@ -20,8 +20,8 @@ int ls(int fd, struct inode inodes){
     ret = read(fd, &buf, sizeof(buf));
     //int test = inodes.direct_blk[0];
     
-    printf("inode#\ttype\tsize\t\tname\t\tcreate on\n"); // print useless title on top
-    printf("=========================================================\n");
+    printf("inode#\ttype\tsize\t\t\tname\tcreated on\n"); // print useless title on top
+    printf("==========================================================\n");
     int entry = 0; // 1st entry start at 0
     while(entry < ret){ // while less than read buffer(4K)
         //printf("accessing: %d\n",test);
@@ -33,7 +33,7 @@ int ls(int fd, struct inode inodes){
         lseek(fd, INODE_OFFSET+i_offset, SEEK_SET); // goto that inode offset
         read(fd, &ls_inode, sizeof(struct inode)); // read that inode to ls_inode
         //print_inode(ls_inode);
-        printf("#%d %9d %7d %15s %36s",
+        printf("#%d %9d %7d %23s %28s",
                 dir_entries->inode_number,
                 ls_inode.i_type,
                 ls_inode.i_size,
