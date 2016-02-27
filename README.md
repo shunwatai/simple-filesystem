@@ -3,12 +3,13 @@
 ###This homework not finish yet, and I may not finish it on time. Also, many bugs + unreadable codes, please read the entire README.
 
 ###important notice!!!:
-1. must use "ABSOLUTE PATH" in the SFS. Why?? Actually, this SFS not mount on any "/" directory. The prefix of "/" in SFS is fake!!! when user input the abs. path, the first char "/" will be ignored, thats why the parameter "path" in ```split_path()``` func. always +1.
-2. for the open_t.c, it is very mess. Also, I DID NOT(forgot) use the parameter "flags", actually I think if flags=0 run create file func.; if flags=1 run make directory func.; if flags=2 run read file func. However, I just put those func directly in externt_cp, mkdir_t, cat_t....
-3. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
-4. only used the direct data block & 2nd direct blk. The indirect blk are not implemented yet, so DO NOT copy file that greater than 8192bytes
-5. the ```split_path()``` func. in ```open_t.c``` is buggy. I dont know there is a ```strsep()``` in C when I doing this homework. I may use strsep() to replace my self-implement split func. if I have time.
-
+1. for the open_t.c, it is very mess. Also, I DID NOT(forgot) use the parameter "flags", actually I think if flags=0 run create file func.; if flags=1 run make directory func.; if flags=2 run read file func. However, I just put those func directly in externt_cp, mkdir_t, cat_t....
+2. must use "ABSOLUTE PATH" in the SFS. Why?? Actually, this SFS not mount on any "/" directory. The prefix of "/" in SFS is fake!!! when user input the abs. path, the first char "/" will be ignored, thats why the parameter "path" in ```split_path()``` func. always +1.
+3. When running tshell, ```cat_t```, ```ls_t```, ```cp_t``` are partial support relative path
+4. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
+5. only used the direct data block & 2nd direct blk. The indirect blk are not implemented yet, so DO NOT copy file that greater than 8192bytes
+6. the ```split_path()``` func. in ```open_t.c``` is buggy. I dont know there is a ```strsep()``` in C when I doing this homework. I may use strsep() to replace my self-implement split func. if I have time.
+7. File name in SFS maximum support 10characters because in ```struct dir_mapping```, its var is ```dir[10]```
 
 ####my steps to do this shit:
 1. made the ```mkfs_t.c```, form the layout of HD
@@ -44,7 +45,7 @@
 ###====================================================
 
 ####quick demo:
-####compile the all the C programs
+####compile all the C programs
 You can just use ```gcc``` instead of ```clang``` as the compiler
 
 ```buildHD.sh``` just a shortcut for make the 110M HD and compile and execute ```mkfs_t```:
@@ -119,7 +120,7 @@ Try ```external_cp``` a small file>8192 which use indirect block:
     tshell### [/]$ external_cp chapter_01.html /
     the external file will use inode#4
     inode of current dir: 0
-    
+
 Try ```ls_t``` to see the copied files:
 
     tshell### [/]$ ls_t
