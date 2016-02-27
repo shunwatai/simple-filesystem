@@ -33,6 +33,11 @@ int main(int argc, char* argv[]){
     struct stat st; // to get the file size later
 
     src = open(argv[1],O_RDONLY); // open the source file for read only
+    //printf("src: %d\n",src);
+    if(src==-1){
+        printf("failed to open source file...\n");
+        return -1;
+    }
     fstat(src,&st); // get the status of src file?
     ssize_t size = st.st_size; // get the size
     //printf("size of src file: %zd\n",size);
