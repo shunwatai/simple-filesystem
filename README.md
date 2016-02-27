@@ -1,6 +1,6 @@
-##please read the Assign1.pdf for details 
+###please read the Assign1.pdf for details 
 
-##This homework not finish yet, and I may not finish it on time. Also, many bugs + unreadable codes, please read the entire README.
+###This homework not finish yet, and I may not finish it on time. Also, many bugs + unreadable codes, please read the entire README.
 
 ###important notice!!!:
 1. must use "ABSOLUTE PATH" in the SFS. Why?? Actually, this SFS not mount on any "/" directory. The prefix of "/" in SFS is fake!!! when user input the abs. path, the first char "/" will be ignored, thats why the parameter "path" in ```split_path()``` func. always +1.
@@ -21,7 +21,7 @@
 8. worked on ```cp_t.c```, just copied most of the codes from ```external_cp.c``` except the handling the source(argv[1]), just use ```open_t``` to find its inode#
 9. implemented 2nd direct block & indirect block
 9. made the tshell
-10. hardcode the cd_t in tshell
+10. hardcode the ```cd_t``` in tshell
 
 ####TODO:
 - [x] mkfs_t.c
@@ -41,13 +41,15 @@
 - [x] fix issues on ```external_cp.c``` => destination with its name, now just allow the dir name as the destination
 - [ ] handle the ```flags``` parameter in```open_t.c```
 
-####quick demo:
+###====================================================
 
+####quick demo:
+####compile the all the C programs
 You can just use ```gcc``` instead of ```clang``` as the compiler
 
 ```buildHD.sh``` just a shortcut for make the 110M HD and compile and execute ```mkfs_t```:
 
-    ./buildHD.sh
+    ./buildHD.sh    
 
 compile system call functions [details](https://stackoverflow.com/questions/2831361/how-can-i-create-c-header-files):
 
@@ -65,43 +67,103 @@ compile user commands:
     clang ../sfs_functions/{open_t.o,write_t.o} external_cp.c -o external_cp
     clang ../sfs_functions/{open_t.o,write_t.o} cp_t.c -o cp_t
     clang ../sfs_functions/{open_t.o,read_t.o} cat_t.c -o cat_t
+    clang ../sfs_functions/open_t.o cd_t.c -o cd_t
+    clang ../sfs_functions/open_t.o tshell.c -o tshell   
+    
+####run tshell and some basic commands
+Now run ```tshell```:
 
-Now try to ls, ```./ls_t /```:
+    ./tshell
+    tshell### [/]$
+    
+Try ```ls_t```:
 
-    ./ls_t /
+    tshell### [/]$ ls_t
     inode#  type    size            name            create on
     =========================================================
-    #0         0      32               .            Thu Feb 18     01:00:06 2016
-    #0         0      32              ..            Thu Feb 18     01:00:06 2016
+    #0         0      32               .            Sat Feb 27 11:38:58 2016
+    #0         0      32              ..            Sat Feb 27 11:38:58 2016
 
-make a directory:
+Try ```mkdir_t```:
 
-    ./mkdir_t /test_dir
+    tshell### [/]$ mkdir_t /test_dir
     entry[0]: test_dir
     path splited: 1
+    p_n: 0
     new dir test_dir wrote on inode#1.
+    
+Try to ```ls_t``` again to see the directory just created:
 
-ls again:
-
-    ./ls_t
+    tshell### [/]$ ls_t
     inode#  type    size            name            create on
     =========================================================
-    #0         0      48               .            Thu Feb 18 01:00:06 2016
-    #0         0      48              ..            Thu Feb 18 01:00:06 2016
-    #1         0      32        test_dir            Thu Feb 18 01:09:34 2016
+    #0         0      48               .            Sat Feb 27 11:38:58 2016
+    #0         0      48              ..            Sat Feb 27 11:38:58 2016
+    #1         0      32        test_dir            Sat Feb 27 11:41:32 2016
 
-try ```external_cp```:
+####Use external_cp to copy 3 files
+Try ```external_cp``` a small file<4096 which use 1st direct block:
 
-    ./external_cp hello.txt /
-    ./ls_t
+    tshell### [/]$ external_cp hello.txt /
+    the external file will use inode#2
+    inode of current dir: 0
+    
+Try ```external_cp``` a small file<8192 which use 2nd direct block:
+
+    tshell### [/]$ external_cp dbtest.txt /      
+    the external file will use inode#3
+    inode of current dir: 0
+    
+Try ```external_cp``` a small file>8192 which use indirect block:
+    
+    tshell### [/]$ external_cp chapter_01.html /
+    the external file will use inode#4
+    inode of current dir: 0
+    
+Try ```ls_t``` to see the copied files:
+
+    tshell### [/]$ ls_t
     inode#  type    size            name            create on
     =========================================================
-    #0         0      59               .            Fri Feb 19 10:09:40 2016
-    #0         0      59              ..            Fri Feb 19 10:09:40 2016
-    #1         0      32        test_dir            Fri Feb 19 10:12:17 2016
-    #2         1      11       hello.txt            Fri Feb 19 10:13:36 2016
+    #0         0   14562               .            Sat Feb 27 11:38:58 2016
+    #0         0   14562              ..            Sat Feb 27 11:38:58 2016
+    #1         0      32        test_dir            Sat Feb 27 11:41:32 2016
+    #2         1      14       hello.txt            Sat Feb 27 11:44:07 2016
+    #3         1    4625      dbtest.txt            Sat Feb 27 11:50:06 2016
+    #4         1    9875      chapter_01            Sat Feb 27 11:51:11 2016
+    
+####Now use cat_t to view the content:
 
-try ```cat_t```:
+    tshell### [/]$ cat_t hello.txt 
+    hello, sfs :D
+    
+    tshell### [/]$ cat_t dbtest.txt       
+    create table person(id int, name varchar(255));
+    create table location(placename varchar(255), attrname varchar(255), attrtype varchar(255), country varchar(255));
+    create table visited(id int, placename varchar(255), year year);
 
-    ./cat_t /hello.txt
-    hello, sfs
+    insert into person values(001, 'sam');
+    ...   
+    
+    tshell### [/]$ cat_t chapter_01.html 
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml">
+
+    <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    ...
+    
+####Now try cp_t and cd_t:
+    tshell### [/]$ cp_t hello.txt /test_dir/bye
+    
+    tshell### [/]$ cd_t /test_dir
+    
+    tshell### [/test_dir]$ ls_t
+    inode#  type    size            name            create on
+    =========================================================
+    #1         0      46               .            Sat Feb 27 11:41:32 2016
+    #0         0   14562              ..            Sat Feb 27 11:38:58 2016
+    #5         1      14             bye            Sat Feb 27 12:02:44 2016
+
+    tshell### [/test_dir]$ cat_t bye
+    hello, sfs :D
