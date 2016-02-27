@@ -7,9 +7,8 @@
 2. must use "ABSOLUTE PATH" in the SFS. Why?? Actually, this SFS not mount on any "/" directory. The prefix of "/" in SFS is fake!!! when user input the abs. path, the first char "/" will be ignored, thats why the parameter "path" in ```split_path()``` func. always +1.
 3. When running tshell, ```cat_t```, ```ls_t```, ```cp_t``` are partial support relative path
 4. For superblock, the instructions in PDF said that use "index number" to indicate the next available inode & data block. But I used the "offset"
-5. only used the direct data block & 2nd direct blk. The indirect blk are not implemented yet, so DO NOT copy file that greater than 8192bytes
-6. the ```split_path()``` func. in ```open_t.c``` is buggy. I dont know there is a ```strsep()``` in C when I doing this homework. I may use strsep() to replace my self-implement split func. if I have time.
-7. File name in SFS maximum support 10characters because in ```struct dir_mapping```, its var is ```dir[10]```
+5. the ```split_path()``` func. in ```open_t.c``` is buggy. I dont know there is a ```strsep()``` in C when I doing this homework. I may use strsep() to replace my self-implement split func. if I have time.
+6. File name in SFS maximum support 10characters because in ```struct dir_mapping```, its var is ```dir[10]```
 
 ####My calculation of the maximum size of a single file that can store in this SFS:
     
