@@ -99,12 +99,12 @@ int main(int argc, char* argv[]){
                 strncat(path,"/", sizeof(char));
             }
         }
-        printf("pp:%s\n",path);
+        //printf("path:%s\n",path);
         dir_inode = open_t(path,2); // get inode number again of that dir
     } else { // else the user did not specific the file name. just the path of dir,
         strncpy(filename, argv[1], sizeof(filename)); // so use the src name
     }
-    printf("pinode: %d\n",dir_inode);
+    //printf("pinode: %d\n",dir_inode);
 
     /* add the copied file into the directory entry */
     struct inode inodes={};

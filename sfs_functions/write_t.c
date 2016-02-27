@@ -71,7 +71,7 @@ int write_t(int inode_number, int offset, void *buf, int count){
 
     /* if count greater than 4096 2nd direct */
     if(count>BLOCK_SIZE && remain_size<BLOCK_SIZE){
-        printf("writing on 2nd directblk...\n");
+        //("writing on 2nd directblk...\n");
         //printf("buf start at 4096: \n%s", buf+BLOCK_SIZE);
         inodes.direct_blk[1] = offset+BLOCK_SIZE; // 2nd blk is the 4096bytes next to 1st blk
         lseek(fd, inodes.direct_blk[1], SEEK_SET);   // go to the data blk region  
@@ -82,7 +82,7 @@ int write_t(int inode_number, int offset, void *buf, int count){
         }
     }
     if(remain_size>BLOCK_SIZE){
-        printf("dllm\n");
+        //("dllm\n");
         inodes.direct_blk[1] = offset+BLOCK_SIZE; // 2nd blk is the 4096bytes next to 1st blk
         lseek(fd, inodes.direct_blk[1], SEEK_SET);   // go to the data blk region  
         ret = write(fd, buf+BLOCK_SIZE, BLOCK_SIZE); // write buf to data blk
@@ -108,9 +108,13 @@ int write_t(int inode_number, int offset, void *buf, int count){
             
             /* write the data to pointer offset region */            
             lseek(fd, indrtblk_offset, SEEK_SET);  // goto offset of indirct blk pointer
-            printf("remain: %d\n",remain_size);
+            //("remain: %d\n",remain_size);
             if(remain_size<BLOCK_SIZE){   // if the remaining size less than 4k blk,                
-                write(fd, buf+((BLOCK_SIZE*2 + i*BLOCK_SIZE)-1), remain_size); // just write it                
+                write(fd, buf+((BLOCK_SIZE*2 + i*BLOCK_SIZE)), remain_size); // just write it 
+                //char *test=buf+((BLOCK_SIZE*2 + i*BLOCK_SIZE));                  
+                //for(int i=0; i<remain_size; i++){
+                    //printf("%c",test[i]);
+                //}
                 break;
             }
             write(fd, &buf+(BLOCK_SIZE*2 + i*BLOCK_SIZE), BLOCK_SIZE); // write the file content to blk
@@ -150,7 +154,7 @@ int write_t(int inode_number, int offset, void *buf, int count){
         perror("failed to read superblk");
         return -1;
     }
-    print_sb(sb);
+    //print_sb(sb);
     
     sb.next_available_inode = sb.next_available_inode + sizeof(struct inode);
     if(inodes.i_blocks<3){ // no indirect blk
