@@ -1,5 +1,5 @@
+###last commit. 屌，唔撚做喇！ 冇時間搵min-term
 ###please read the Assign1.pdf for details 
-
 ###This homework not finish yet, and I may not finish it on time. Also, many bugs + unreadable codes, please read the entire README.
 
 ###important notice!!!:
