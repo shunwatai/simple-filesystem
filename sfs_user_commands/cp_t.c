@@ -43,7 +43,11 @@ int main(int argc, char *argv[]){
     /* step 1: get the inode# of the src file */
     char *src = argv[1]; // get the src from user input    
     int src_inode_num = open_t(src, 2); // get the inode# by open_t, flag 2 means existing file but it is useless on my implementation
-    printf("src inode# is %d\n", src_inode_num);
+    if(src_inode_num==-1){
+        printf("source not exist in SFS...\n");
+        return -1;
+    }
+    //printf("src inode# is %d\n", src_inode_num);
     
     /* step 2: get the size and read its data to a buf */
     ssize_t src_size = 0;    
@@ -60,12 +64,15 @@ int main(int argc, char *argv[]){
     char buf[src_size];  // make a buffer for the src file content
     
     lseek(fd, src_inode.direct_blk[0], SEEK_SET); // goto the datablk offset for read the real data to buf
-    ret = read(fd, &buf, src_size);
+    ret = read_t( src_inode.i_number, src_inode.direct_blk[0], &buf, src_size);
+    //ret = read(fd, &buf, src_size);
     if(ret!=src_size){
         perror("failed to read the file content");
         return -1;
     }
-    printf("buf: %s",buf);
+    //for(int i=0; i<src_size; i++){
+        //printf("%c",buf[i]);
+    //}
     
     /* step 3: get the nx ava inode & datablk from superblk */
     struct superblock sb={};
@@ -78,7 +85,7 @@ int main(int argc, char *argv[]){
     }
     
     int inode_num = (sb.next_available_inode-INODE_OFFSET) / sizeof(struct inode);
-    printf("new file will copy to inode#%d\n", inode_num);
+    //printf("new file will copy to inode#%d\n", inode_num);
     
     /* write the file content to the new inode and datablk by write_t */
     write_t(inode_num, sb.next_available_blk, buf, src_size);
@@ -94,7 +101,7 @@ int main(int argc, char *argv[]){
         strncpy(filename,entry_name[splits-1],sizeof(filename)); // copy last part as filename that will be created
         
         strncpy(path, "/.", sizeof(path)); // copy "/." as path
-        printf("path: %s, sizeof(path): %lu\n",path, sizeof(path));
+        //printf("path: %s, sizeof(path): %lu\n",path, sizeof(path));
         
         if(splits>1){ // if split more than 1, copy to sub dir
             strncpy(path, "/", sizeof(char)+1);
@@ -108,8 +115,8 @@ int main(int argc, char *argv[]){
             }            
         }
         dpath_inode = open_t(path, 2);
-        printf("path: %s, fname: %s\n",path, filename);
-        printf("INdestination inode#%d\n",dpath_inode);
+        //printf("path: %s, fname: %s\n",path, filename);
+        //printf("destination inode#%d\n",dpath_inode);
     }else{
         strncpy(path, dpath, strlen(dpath));
     }
