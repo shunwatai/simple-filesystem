@@ -39,12 +39,6 @@ int read_t( int inode_number, int offset, void *buf, int count){
     //int file_size = inodes.i_size; // get file size
     int num_blocks = inodes.i_blocks; // get number of blocks
     
-    /* if file size greater than 4096, 2nd direct blk is needed to read. 
-     * if greater than 8192, indirect blk is needed.
-     * but I dont know how to implement yet, so just read the 1st direct blk here */
-    //int datablk_offset = inodes.direct_blk[0]; // offset of 1st direct datablk
-    
-    
     /* seek to data blk according to offset parameter */
     lseek(fd, offset, SEEK_SET); // seek to data blk which storing real data
     char tmpbuf[count+1]; // store the read string temporary

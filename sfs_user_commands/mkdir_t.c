@@ -163,12 +163,12 @@ int main(int argc, char *argv[]){
     count_split = split_path(dir_name+1, entry_name) + 1; // split the path into pieces. this func. from open_t.c
     /* for testing, print all the entries */
     for(int i=0; i<MAX_NESTING_DIR; i++){
-        printf("entry[%d]: %s\n",i,entry_name[i]);
+        //printf("entry[%d]: %s\n",i,entry_name[i]);
         if(!*entry_name[i+1]){ // if empty, break
             break;
         }
     }
-    printf("path splited: %d\n",count_split);
+    //printf("path splited: %d\n",count_split);
 
     /* the else part for get the path of parent dir */
     if(count_split==1){ // root dir, only 1 "/" detected
@@ -191,7 +191,7 @@ int main(int argc, char *argv[]){
         /* after got the parent path, now use open_t to get the inode# for ".." */
         parent_inode = open_t(buf, 2); // buf+1 for ignore 1st "/", flag is 2 for existing dir
     }
-    printf("p_n: %d\n",parent_inode);
+    //printf("p_n: %d\n",parent_inode);
 
     makedir(fd, &sb, &inodes, dir_name, parent_inode); // create the dir by makedir()
     
