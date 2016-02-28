@@ -59,7 +59,7 @@ int read_t( int inode_number, int offset, void *buf, int count){
     }
     
     /* read 2nd directblk */
-    if(count>BLOCK_SIZE && remainsize<BLOCK_SIZE){
+    if(count>BLOCK_SIZE && remainsize<=BLOCK_SIZE){
         //printf("reading remaining buf: %d...\n", remainsize);
         lseek(fd, inodes.direct_blk[1], SEEK_SET); // goto 2nd direct blk
         ret += read(fd, &tmpbuf, remainsize); // read remainsize to tmpbuf
@@ -82,7 +82,7 @@ int read_t( int inode_number, int offset, void *buf, int count){
             lseek(fd, inodes.indirect_blk+i*sizeof(int), SEEK_SET); // goto indirectblk
             read(fd, &ptr_offset, sizeof(int)); // read the offset of indirectblk ptr
             lseek(fd, ptr_offset, SEEK_SET); // go to offset of that datablk
-            if(remainsize<BLOCK_SIZE){ // if less than 4k,
+            if(remainsize<=BLOCK_SIZE){ // if less than 4k,
                 //printf("reading last blk...\n");                
                 ret += read(fd, &tmpbuf, remainsize); // just read the remaining
                 tmpbuf[remainsize] = '\0'; // add a null char to terminate the string at the end

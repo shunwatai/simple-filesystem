@@ -70,7 +70,7 @@ int write_t(int inode_number, int offset, void *buf, int count){
     }
 
     /* if count greater than 4096 2nd direct */
-    if(count>BLOCK_SIZE && remain_size<BLOCK_SIZE){
+    if(count>BLOCK_SIZE && remain_size<=BLOCK_SIZE){
         //("writing on 2nd directblk...\n");
         //printf("buf start at 4096: \n%s", buf+BLOCK_SIZE);
         inodes.direct_blk[1] = offset+BLOCK_SIZE; // 2nd blk is the 4096bytes next to 1st blk
@@ -109,7 +109,7 @@ int write_t(int inode_number, int offset, void *buf, int count){
             /* write the data to pointer offset region */            
             lseek(fd, indrtblk_offset, SEEK_SET);  // goto offset of indirct blk pointer
             //("remain: %d\n",remain_size);
-            if(remain_size<BLOCK_SIZE){   // if the remaining size less than 4k blk,                
+            if(remain_size<=BLOCK_SIZE){   // if the remaining size less than 4k blk,                
                 write(fd, buf+((BLOCK_SIZE*2 + i*BLOCK_SIZE)), remain_size); // just write it 
                 //char *test=buf+((BLOCK_SIZE*2 + i*BLOCK_SIZE));                  
                 //for(int i=0; i<remain_size; i++){
